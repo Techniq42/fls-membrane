@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.log
+.env
+
+# local experiments / operational scratch - never part of the published kit
+watcher.py
+requests_chair.py
+*_run_*.md
