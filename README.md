@@ -45,7 +45,7 @@ N sovereign boxes that need to talk, none of them trusting a central one.
 | `04-caged-seats.md` | CC BY 4.0 | How the valve works, and why it's capability-not-access at the SSH layer |
 | `SYNAPSE-HANDSHAKE.md` | CC BY 4.0 | How two boxes **hinge** (bidirectional caged seats) into a mesh - no hub; commons vs. capacity |
 | `05-coordination-game.md` | CC BY 4.0 | accept → deliver → **opt-in** check → credit: honest coordination with no boss (tickets + a tag ledger) |
-| `SOUL.md` | CC BY 4.0 | Pointer to a narrative agent constitution (livingsys.org) |
+| `SOUL.md` | CC BY 4.0 | Pointer to the agent's logic gate - the Regenerative Gem (shannondobbs.com/regenerative-gem/) |
 
 ## The two "doorbells" (this is the handshake)
 - **MCP call** = an agent *synchronously calls a capability* (a tool). Use this
@@ -127,7 +127,8 @@ the attribution, and pass the ground forward.
 
 Dual-licensed by file type: code (`.sql`, `.sh`, `.py`) under **Apache-2.0** (see
 `LICENSE`, `NOTICE`); prose (`README.md`, `WHY.md`, `SOUL.md`) under **CC BY 4.0**.
-The SOUL is canonical at [livingsys.org](https://livingsys.org/resources/agent-constitution) -
+The SOUL points at its canonical logic gate - the Regenerative Gem at
+[shannondobbs.com/regenerative-gem/](https://shannondobbs.com/regenerative-gem/) -
 link it, don't fork it. Share the how, hold the what.
 
 - Shannon Dobbs, Fellowship of Living Systems · [shannondobbs.com](https://shannondobbs.com) · [livingsys.org](https://livingsys.org)

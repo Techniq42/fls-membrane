@@ -4,7 +4,7 @@
 -- BEFORE: A steward asks the oracle "add ACME" 4x because the state is invisible.
 -- AFTER: it's ONE row every seat + human reads. Add once; everyone sees it.
 INSERT INTO registry (entity, kind, added_by, approved_by, source_url)
-VALUES ('ACME','organisation','coordinator','a-steward','https://livingsys.org/resources/agent-constitution')
+VALUES ('ACME','organisation','coordinator','a-steward','https://acme.org')
 ON CONFLICT (entity) DO NOTHING;
 
 -- anyone (bot, worker, human) now just READS it — no re-poking the oracle:

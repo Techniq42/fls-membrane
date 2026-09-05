@@ -3,7 +3,7 @@
 -- The shared commons an "oracle" agent should stand on: legible state,
 -- multi-writer handoff, and a lane to escalate hard questions to a bigger tier.
 -- Blackboard architecture (Hearsay-II, 1970s) for LLM agent seats.
--- Canonical write-up + the SOUL it pairs with: https://livingsys.org/resources/agent-constitution
+-- Canonical write-up + the SOUL it pairs with: https://shannondobbs.com/regenerative-gem/
 -- ============================================================================
 
 -- 1) COORDINATION — the seat-to-seat status board. "Who is doing what."
