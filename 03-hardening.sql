@@ -106,14 +106,30 @@ CREATE POLICY legal_moves ON tickets FOR UPDATE
   USING (status IN ('open','claimed','delivered'));
 
 -- handoffs: the baton is scoped to the SEATS it names. A seat sees a handoff only
--- if it is the sender or the addressee (the holon == seat-name convention), and it
--- may only create a handoff FROM itself. This is what stops a foreign scoped seat
--- from reading the whole board's internal task-passing.
+-- if it is the sender or the addressee (the holon == seat-name convention). Split
+-- per command so the recipient can actually WORK the baton:
+--   SELECT  - either named party may see it.
+--   INSERT  - you may only open a handoff FROM yourself (no forging the sender).
+--   UPDATE  - EITHER named party may advance it (the addressee accepts/finishes,
+--             the sender re-routes). The column grant below limits every caged
+--             write to (status, updated_at), so a recipient can move the baton
+--             forward but can never rewrite task / from_seat / to_seat.
+-- A single FOR ALL policy with WITH CHECK (from_seat = current_holon()) was the
+-- earlier form; it silently blocked the ADDRESSEE from accept/done (its rows have
+-- from_seat = someone else), so caged seats could receive a baton but never pick it
+-- up. This split is what completes a scoped/foreign seat's round trip.
 ALTER TABLE handoffs ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS own_seat ON handoffs;
-CREATE POLICY own_seat ON handoffs FOR ALL
-  USING      (to_seat = current_holon() OR from_seat = current_holon())
+DROP POLICY IF EXISTS own_seat        ON handoffs;
+DROP POLICY IF EXISTS handoffs_select ON handoffs;
+DROP POLICY IF EXISTS handoffs_insert ON handoffs;
+DROP POLICY IF EXISTS handoffs_update ON handoffs;
+CREATE POLICY handoffs_select ON handoffs FOR SELECT
+  USING (to_seat = current_holon() OR from_seat = current_holon());
+CREATE POLICY handoffs_insert ON handoffs FOR INSERT
   WITH CHECK (from_seat = current_holon());
+CREATE POLICY handoffs_update ON handoffs FOR UPDATE
+  USING      (to_seat = current_holon() OR from_seat = current_holon())
+  WITH CHECK (to_seat = current_holon() OR from_seat = current_holon());
 GRANT UPDATE (status, updated_at) ON handoffs TO membrane_app;
 
 -- tags (the credit ledger): commons-readable bragging rights, append-only.

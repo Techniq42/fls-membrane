@@ -41,3 +41,30 @@ Prereqs: `membrane-mcp.py` staged and launchable; a role carrying the lane grant
 
 The peer points their MCP client at your box over SSH with the matching private key (see
 `SYNAPSE-HANDSHAKE.md`). They get the tools for their holon + the commons, and nothing else.
+
+## Proven end-to-end (what completes the round trip)
+
+The valve was only half-tested until a scoped seat had to *work*, not just *read*. Standing one up
+end to end surfaced the last two things a foreign holon needs, and both are now in the schema:
+
+1. **Identity is the whole fix.** A seat that connects on the wrong role sees nothing addressed to
+   it - not because anything is broken, but because `current_holon()` is keyed on `session_user`, so
+   an unmapped or borrowed role resolves to the wrong holon (or `NULL`) and every RLS check quietly
+   misses. The seat exists in name but has no holon. `add-caged-seat.sh` is the single source of
+   truth: **OS user + role (member of `membrane_app`, NOT owner) + `holon_roles` row**, all three or
+   none. Skip the `holon_roles` row and the seat is a ghost - visible on the board, blind to its own
+   mail.
+
+2. **The addressee has to be able to pick up the baton.** The handoff policy is split per command
+   (`03-hardening.sql`): either named party may advance a handoff, but the column grant pins caged
+   writes to `(status, updated_at)`. So a recipient can accept and finish work sent to it, yet can
+   never rewrite the task, the sender, or the addressee. The earlier single `FOR ALL` policy checked
+   `from_seat = current_holon()` on every write, which let a seat *send* but silently refused the
+   *addressee's* accept/done (its rows carry someone else's `from_seat`). A baton you can receive but
+   never pick up isn't a round trip. This split is what closes it.
+
+Verified as a live scoped role: sees only handoffs it is a party to; accepts and finishes inbound
+work; opens outbound handoffs from itself; **cannot** forge a sender, touch another holon's rows, or
+rewrite handoff content. That is the external seat working the full loop while the cage holds - the
+membrane's note-passing now reaches a foreign box and comes back, without ever widening the box it
+came from.
