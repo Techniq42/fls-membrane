@@ -8,6 +8,9 @@ This kit is that missing layer: a few Postgres lanes + the pattern to wire any
 agent to them. It's the blackboard architecture (Hearsay-II,
 1970s) done cleanly for LLM agent seats.
 
+## Never run a server before? Start there.
+The quickstart just below assumes you already have a server with Postgres on it. If you're starting from *nothing* — no box, never opened a terminal — read **[SETUP.md](SETUP.md)** first. It's the from-zero first mile, and it's written to be **handed to Claude Code**: you give it the file, say *"set this up for me and explain each step before you do it,"* and you direct while the machine does the wiring. Then come back here for the round-trip.
+
 ## Fork quickstart (stand up your OWN on your OWN VPS)
 Your data stays behind your wall. One file does setup + the whole capability layer.
 ```bash
