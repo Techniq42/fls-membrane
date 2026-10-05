@@ -139,6 +139,111 @@ DROP POLICY IF EXISTS commons_or_mine ON tags;
 CREATE POLICY commons_or_mine ON tags
   USING (visibility = 'commons' OR holon = current_holon());
 
+-- 6) BIND THE HANDS TO THE IDENTITY (names a row records = who really wrote it) -
+-- RLS above caps the EYES: what a seat can see. It does not check the NAMES a
+-- write carries: opened_by / claimed_by / agent / from_agent / answered_by /
+-- added_by are plain text the caller supplies, so a seat connected as bob could
+-- open, claim, deliver, post and answer as 'alice'. handoffs already closes this
+-- with from_seat = current_holon(); these triggers apply the same rule to every
+-- other lane. The store stamps the name; the seat cannot claim it.
+--   - a seat may label its own sub-agents '<holon>:<label>' (e.g. bob:researcher);
+--     any other name is replaced by the seat's holon.
+--   - a connection with no holon (the owner/admin, or a single-role box) is the
+--     trusted path and is left as written. Every caged seat MUST have a
+--     holon_roles row - add-caged-seat.sh does this.
+-- Run `bash test-identity.sh` to prove it on a throwaway cluster.
+CREATE OR REPLACE FUNCTION bind_name(supplied text, me text) RETURNS text
+  LANGUAGE sql IMMUTABLE AS
+$fn$ SELECT CASE WHEN supplied = me OR supplied LIKE me || ':%' THEN supplied ELSE me END $fn$;
+
+-- coordination / registry / escalations / tickets: stamp the author on INSERT.
+CREATE OR REPLACE FUNCTION stamp_author() RETURNS trigger
+  LANGUAGE plpgsql SET search_path = public, pg_temp AS
+$fn$
+DECLARE me text := current_holon();
+BEGIN
+  IF me IS NULL THEN RETURN NEW; END IF;
+  CASE TG_TABLE_NAME
+    WHEN 'coordination' THEN NEW.agent      := bind_name(NEW.agent, me);
+    WHEN 'registry'     THEN NEW.added_by   := bind_name(NEW.added_by, me);
+    WHEN 'escalations'  THEN NEW.from_agent := bind_name(NEW.from_agent, me);
+    WHEN 'tickets'      THEN NEW.opened_by  := bind_name(NEW.opened_by, me);
+  END CASE;
+  RETURN NEW;
+END $fn$;
+-- (registry.approved_by is a claim ABOUT someone else; it stays as written.
+--  Make approval its own signed write if you need it unforgeable.)
+
+DROP TRIGGER IF EXISTS stamp_author ON coordination;
+CREATE TRIGGER stamp_author BEFORE INSERT ON coordination FOR EACH ROW EXECUTE FUNCTION stamp_author();
+DROP TRIGGER IF EXISTS stamp_author ON registry;
+CREATE TRIGGER stamp_author BEFORE INSERT ON registry     FOR EACH ROW EXECUTE FUNCTION stamp_author();
+DROP TRIGGER IF EXISTS stamp_author ON escalations;
+CREATE TRIGGER stamp_author BEFORE INSERT ON escalations  FOR EACH ROW EXECUTE FUNCTION stamp_author();
+DROP TRIGGER IF EXISTS stamp_author ON tickets;
+CREATE TRIGGER stamp_author BEFORE INSERT ON tickets      FOR EACH ROW EXECUTE FUNCTION stamp_author();
+
+-- escalations: the claimer/answerer is whoever makes the move; a claimed
+-- question is answered only by its claimer.
+CREATE OR REPLACE FUNCTION escalation_moves() RETURNS trigger
+  LANGUAGE plpgsql SET search_path = public, pg_temp AS
+$fn$
+DECLARE me text := current_holon();
+BEGIN
+  IF me IS NULL THEN RETURN NEW; END IF;
+  IF NEW.status = 'claimed' AND OLD.status = 'needs_help' THEN
+    NEW.claimed_by := bind_name(NEW.claimed_by, me);
+  ELSE
+    NEW.claimed_by := OLD.claimed_by;
+  END IF;
+  IF NEW.status = 'answered' AND OLD.status <> 'answered' THEN
+    IF OLD.status = 'claimed' AND bind_name(OLD.claimed_by, me) IS DISTINCT FROM OLD.claimed_by THEN
+      RAISE EXCEPTION 'escalation % is claimed by %; only the claimer answers it', OLD.id, OLD.claimed_by;
+    END IF;
+    NEW.answered_by := bind_name(NEW.answered_by, me);
+  ELSE
+    NEW.answered_by := OLD.answered_by;
+    NEW.answer      := OLD.answer;
+  END IF;
+  RETURN NEW;
+END $fn$;
+DROP TRIGGER IF EXISTS escalation_moves ON escalations;
+CREATE TRIGGER escalation_moves BEFORE UPDATE ON escalations FOR EACH ROW EXECUTE FUNCTION escalation_moves();
+
+-- tickets: only the legal transitions, each made by the right hand.
+--   open -> claimed        any seat; claimed_by := that seat
+--   claimed -> delivered   the claimer only; the only move that sets deliverable
+--   delivered -> critiqued | closed   any seat; the only move that sets critique
+-- (the cross-holon "can't grade your own homework" rule from
+--  05-coordination-game.md layers on top of this.)
+CREATE OR REPLACE FUNCTION ticket_moves() RETURNS trigger
+  LANGUAGE plpgsql SET search_path = public, pg_temp AS
+$fn$
+DECLARE me text := current_holon();
+BEGIN
+  IF me IS NULL THEN RETURN NEW; END IF;
+  IF (OLD.status, NEW.status) NOT IN (('open','claimed'), ('claimed','delivered'),
+                                      ('delivered','critiqued'), ('delivered','closed')) THEN
+    RAISE EXCEPTION 'ticket %: % -> % is not a legal move', OLD.id, OLD.status, NEW.status;
+  END IF;
+  NEW.claimed_by  := CASE WHEN NEW.status = 'claimed'   THEN bind_name(NEW.claimed_by, me) ELSE OLD.claimed_by END;
+  NEW.deliverable := CASE WHEN NEW.status = 'delivered' THEN NEW.deliverable ELSE OLD.deliverable END;
+  NEW.critique    := CASE WHEN OLD.status = 'delivered' THEN NEW.critique    ELSE OLD.critique END;
+  IF NEW.status = 'delivered' AND bind_name(OLD.claimed_by, me) IS DISTINCT FROM OLD.claimed_by THEN
+    RAISE EXCEPTION 'ticket % is claimed by %; only the claimer delivers it', OLD.id, OLD.claimed_by;
+  END IF;
+  RETURN NEW;
+END $fn$;
+DROP TRIGGER IF EXISTS ticket_moves ON tickets;
+CREATE TRIGGER ticket_moves BEFORE UPDATE ON tickets FOR EACH ROW EXECUTE FUNCTION ticket_moves();
+
+-- tags: seats can READ credit but never WRITE it. Credit is system-applied by a
+-- trigger owned by a privileged role (it bypasses this), never self-declared.
+-- The RESTRICTIVE policy holds even if 01-schema.sql's blanket grant is re-run.
+REVOKE INSERT ON tags FROM membrane_app;
+DROP POLICY IF EXISTS no_seat_credit ON tags;
+CREATE POLICY no_seat_credit ON tags AS RESTRICTIVE FOR INSERT TO membrane_app WITH CHECK (false);
+
 -- ============================================================================
 -- Sovereign alternative to per-holon roles: keep a single application role and
 -- set the holon SERVER-SIDE inside a trusted capability layer (an MCP server, or

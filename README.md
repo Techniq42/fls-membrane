@@ -39,11 +39,12 @@ N sovereign boxes that need to talk, none of them trusting a central one.
 | `WHY.md` | CC BY 4.0 | **Start here** - what it does and why it exists |
 | `01-schema.sql` | Apache-2.0 | The five lanes (coordination, registry, escalations, tickets, handoffs) + the credit-ledger `tags` table + the RLS "eyes" |
 | `02-demos.sql` | Apache-2.0 | Demo A: the four-times-ACME fix. Demo B: escalate-to-frontier |
-| `03-hardening.sql` | Apache-2.0 | Optional multi-party hardening: RLS on every lane, unforgeable per-holon identity, writes narrowed to legal moves |
+| `03-hardening.sql` | Apache-2.0 | Optional multi-party hardening: RLS on every lane, unforgeable per-holon identity, the names a row records bound to that identity, writes narrowed to legal moves |
 | `membrane.sh` | Apache-2.0 | One-file stand-up + the whole capability layer (setup/register/board/escalate/pending/answer/read) |
 | `router.py` | Apache-2.0 | The pure router: recognizes + routes by tier, never reasons, model-agnostic |
 | `membrane-mcp.py` | Apache-2.0 | **The MCP layer** - serves the lanes as capability TOOLS (bus/registry/escalations/tickets/handoffs); capability-not-access, peer-auth, stdio |
 | `escalate-demo.sh` | Apache-2.0 | The money demo: frozen-small → frontier handoff, end to end |
+| `test-identity.sh` | Apache-2.0 | Proves one seat can't write in another's name: throwaway Postgres cluster, two seats, every lane (no sudo; touches nothing real) |
 | `add-caged-seat.sh` | Apache-2.0 | **The valve** - provision a caged, scoped seat so another sovereign can reach your tools without opening a hole (forced-command SSH → peer role → holon → RLS) |
 | `04-caged-seats.md` | CC BY 4.0 | How the valve works, and why it's capability-not-access at the SSH layer |
 | `SYNAPSE-HANDSHAKE.md` | CC BY 4.0 | How two boxes **hinge** (bidirectional caged seats) into a mesh - no hub; commons vs. capacity |
