@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="1000" height="580" fill="#ffffff"/>
+  <style>
+    .box  { fill:#ffffff; stroke:#000; stroke-width:2; }
+    .t    { font-size:14px; fill:#000; text-anchor:middle; }
+    .tb   { font-size:14px; fill:#000; text-anchor:middle; font-weight:bold; }
+    .ts   { font-size:12px; fill:#000; text-anchor:middle; }
+    .chan { font-size:15px; fill:#000; font-weight:bold; letter-spacing:1px; }
+    .n    { font-size:13px; fill:#000; font-style:italic; text-anchor:middle; }
+    .ln   { stroke:#000; stroke-width:2; fill:none; }
+    .dl   { stroke:#000; stroke-width:2; fill:none; stroke-dasharray:6 5; }
+    .hatch{ stroke:#000; stroke-width:1; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="7.5" refY="3.5" orient="auto">
+      <path d="M0,0 L8,3.5 L0,7 z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- channel labels -->
+  <text class="chan" x="60" y="60">INSTRUCTION CHANNEL</text>
+  <text class="chan" x="60" y="548">AUTHORIZATION CHANNEL</text>
+
+  <!-- 230 instruction inputs -->
+  <rect class="box" x="80" y="100" width="180" height="70" rx="6"/>
+  <text class="ts" x="170" y="128">INSTRUCTIONS,</text>
+  <text class="ts" x="170" y="145">PROMPTS,</text>
+  <text class="ts" x="170" y="162">TOOL OUTPUTS</text>
+  <text class="n" x="250" y="94">230</text>
+
+  <!-- 120 machine agent -->
+  <rect class="box" x="340" y="100" width="210" height="70" rx="6"/>
+  <text class="tb" x="445" y="130">MACHINE LANGUAGE-</text>
+  <text class="tb" x="445" y="148">MODEL AGENT</text>
+  <text class="n" x="535" y="94">120</text>
+
+  <line class="ln" x1="260" y1="135" x2="340" y2="135" marker-end="url(#a)"/>
+
+  <!-- divider: disjoint channels, with a gate gap at x 372-428 -->
+  <line class="ln" x1="40" y1="282" x2="372" y2="282"/>
+  <line class="ln" x1="40" y1="300" x2="372" y2="300"/>
+  <line class="ln" x1="428" y1="282" x2="960" y2="282"/>
+  <line class="ln" x1="428" y1="300" x2="960" y2="300"/>
+  <!-- hatching between the divider lines -->
+  <g class="hatch">
+    <line x1="64" y1="300" x2="80" y2="282"/><line x1="104" y1="300" x2="120" y2="282"/>
+    <line x1="144" y1="300" x2="160" y2="282"/><line x1="184" y1="300" x2="200" y2="282"/>
+    <line x1="224" y1="300" x2="240" y2="282"/><line x1="264" y1="300" x2="280" y2="282"/>
+    <line x1="304" y1="300" x2="320" y2="282"/><line x1="344" y1="300" x2="360" y2="282"/>
+    <line x1="448" y1="300" x2="464" y2="282"/><line x1="488" y1="300" x2="504" y2="282"/>
+    <line x1="528" y1="300" x2="544" y2="282"/><line x1="568" y1="300" x2="584" y2="282"/>
+    <line x1="608" y1="300" x2="624" y2="282"/><line x1="648" y1="300" x2="664" y2="282"/>
+    <line x1="688" y1="300" x2="704" y2="282"/><line x1="728" y1="300" x2="744" y2="282"/>
+    <line x1="768" y1="300" x2="784" y2="282"/><line x1="808" y1="300" x2="824" y2="282"/>
+    <line x1="848" y1="300" x2="864" y2="282"/><line x1="888" y1="300" x2="904" y2="282"/>
+    <line x1="928" y1="300" x2="944" y2="282"/>
+  </g>
+  <text class="ts" x="700" y="272" font-style="italic">disjoint: the instruction channel cannot reach the authorization channel</text>
+
+  <!-- allowed: access request passes through the gate to the rule -->
+  <line class="ln" x1="400" y1="170" x2="400" y2="360" marker-end="url(#a)"/>
+  <text class="ts" x="330" y="235">access</text>
+  <text class="ts" x="330" y="251">request</text>
+  <text class="ts" x="440" y="332" font-style="italic">gate</text>
+
+  <!-- blocked: instruction cannot modify the rule -->
+  <line class="dl" x1="500" y1="170" x2="500" y2="272"/>
+  <circle cx="500" cy="291" r="13" fill="#ffffff" stroke="#000" stroke-width="2.5"/>
+  <line x1="492" y1="283" x2="508" y2="299" stroke="#000" stroke-width="2.5"/>
+  <line x1="508" y1="283" x2="492" y2="299" stroke="#000" stroke-width="2.5"/>
+  <text class="ts" x="600" y="228">an instruction the agent</text>
+  <text class="ts" x="600" y="244">reads cannot modify</text>
+  <text class="ts" x="600" y="260">the rule</text>
+
+  <!-- 114 rule -->
+  <rect x="330" y="360" width="200" height="70" rx="4" fill="#ffffff" stroke="#000" stroke-width="4"/>
+  <text class="tb" x="430" y="390" font-size="15">PER-RECORD</text>
+  <text class="tb" x="430" y="410" font-size="15">ACCESS RULE</text>
+  <text class="n" x="512" y="378">114</text>
+
+  <!-- 110 datastore -->
+  <rect class="box" x="610" y="356" width="180" height="96" rx="6"/>
+  <text class="tb" x="700" y="384">SHARED STATE</text>
+  <text class="ts" x="700" y="401">(DATASTORE)</text>
+  <rect class="box" x="632" y="412" width="136" height="12"/>
+  <rect class="box" x="632" y="430" width="136" height="12"/>
+  <text class="n" x="770" y="376">110</text>
+
+  <line class="ln" x1="530" y1="395" x2="610" y2="395" marker-end="url(#a)"/>
+  <text class="ts" x="570" y="386" font-style="italic">evaluates</text>
+
+  <text x="500" y="566" font-size="22" font-weight="bold" text-anchor="middle">FIG. 2</text>
+</svg>

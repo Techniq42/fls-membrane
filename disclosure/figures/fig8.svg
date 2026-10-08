@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
+  <style>
+    .box  { fill:#ffffff; stroke:#000; stroke-width:2; }
+    .big  { fill:#ffffff; stroke:#000; stroke-width:2.5; }
+    .tb   { font-size:13px; fill:#000; text-anchor:middle; font-weight:bold; }
+    .ts   { font-size:12px; fill:#000; text-anchor:middle; }
+    .n    { font-size:13px; fill:#000; font-style:italic; text-anchor:middle; }
+    .hd   { font-size:15px; fill:#000; font-weight:bold; }
+    .ln   { stroke:#000; stroke-width:2; fill:none; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="7.5" refY="3.5" orient="auto">
+      <path d="M0,0 L8,3.5 L0,7 z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- TOP: capability, not access -->
+  <text class="hd" x="60" y="82">CAPABILITY, NOT ACCESS  (the invention)</text>
+
+  <rect class="box" x="60" y="108" width="140" height="56" rx="6"/>
+  <text class="tb" x="130" y="141">SEAT</text>
+
+  <rect class="box" x="252" y="108" width="188" height="56" rx="6"/>
+  <text class="tb" x="346" y="132">CAP-SCOPED</text>
+  <text class="ts" x="346" y="150">CONNECTION</text>
+  <text class="n" x="424" y="102">170</text>
+
+  <rect class="box" x="560" y="108" width="220" height="56" rx="6"/>
+  <text class="tb" x="670" y="132">PERMITTED OPS ONLY</text>
+  <text class="ts" x="670" y="150">read assigned records, post</text>
+
+  <rect class="box" x="840" y="108" width="120" height="56" rx="6"/>
+  <text class="ts" x="900" y="134">SHARED</text>
+  <text class="ts" x="900" y="150">STATE</text>
+
+  <line class="ln" x1="200" y1="136" x2="252" y2="136" marker-end="url(#a)"/>
+  <line class="ln" x1="780" y1="136" x2="840" y2="136" marker-end="url(#a)"/>
+
+  <!-- revocation switch (200) between connection and permitted ops -->
+  <line class="ln" x1="440" y1="136" x2="482" y2="136"/>
+  <circle cx="484" cy="136" r="4" fill="#000"/>
+  <line x1="484" y1="136" x2="516" y2="118" stroke="#000" stroke-width="2.5"/>
+  <circle cx="518" cy="136" r="4" fill="#000"/>
+  <line class="ln" x1="520" y1="136" x2="560" y2="136" marker-end="url(#a)"/>
+  <text class="n" x="500" y="196">200</text>
+  <text class="ts" x="500" y="214">REVOCATION</text>
+  <text class="ts" x="500" y="230" font-style="italic">instant; other seats unaffected</text>
+
+  <text class="ts" x="500" y="262" font-style="italic">the seat never receives host-level or datastore-level access to the machine</text>
+
+  <!-- divider -->
+  <line x1="40" y1="300" x2="960" y2="300" stroke="#000" stroke-width="1" stroke-dasharray="3 6"/>
+
+  <!-- BOTTOM: host access (what this replaces) -->
+  <text class="hd" x="60" y="356">HOST ACCESS  (what this replaces)</text>
+
+  <rect class="box" x="60" y="386" width="140" height="56" rx="6"/>
+  <text class="tb" x="130" y="419">SEAT</text>
+
+  <rect class="box" x="252" y="386" width="180" height="56" rx="6"/>
+  <text class="tb" x="342" y="411">SSH / LOGIN</text>
+  <text class="ts" x="342" y="429">shell + sudo</text>
+
+  <rect class="big" x="484" y="386" width="476" height="56" rx="6"/>
+  <text class="tb" x="722" y="410">THE ENTIRE MACHINE</text>
+  <text class="ts" x="722" y="428">root, shell, every file and service</text>
+
+  <line class="ln" x1="200" y1="414" x2="252" y2="414" marker-end="url(#a)"/>
+  <line class="ln" x1="432" y1="414" x2="484" y2="414" marker-end="url(#a)"/>
+
+  <!-- caution -->
+  <circle cx="500" cy="480" r="13" fill="#ffffff" stroke="#000" stroke-width="2.5"/>
+  <text x="500" y="486" font-size="16" font-weight="bold" text-anchor="middle">!</text>
+  <text class="ts" x="640" y="478">a standing door into the whole machine —</text>
+  <text class="ts" x="628" y="494">the exposure this design removes</text>
+
+  <text x="500" y="536" font-size="16" font-weight="bold" text-anchor="middle">FIG. 8</text>
+</svg>

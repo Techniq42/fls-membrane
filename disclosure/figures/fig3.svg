@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
+  <style>
+    .box  { fill:#ffffff; stroke:#000; stroke-width:2; }
+    .dash { fill:#ffffff; stroke:#000; stroke-width:2; stroke-dasharray:7 5; }
+    .tb   { font-size:14px; fill:#000; text-anchor:middle; font-weight:bold; }
+    .ts   { font-size:12px; fill:#000; text-anchor:middle; }
+    .n    { font-size:13px; fill:#000; font-style:italic; text-anchor:middle; }
+    .ln   { stroke:#000; stroke-width:2; fill:none; }
+    .dl   { stroke:#000; stroke-width:2; fill:none; stroke-dasharray:6 5; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="7.5" refY="3.5" orient="auto">
+      <path d="M0,0 L8,3.5 L0,7 z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- 130 authority context -->
+  <rect class="box" x="90" y="104" width="190" height="56" rx="6"/>
+  <text class="tb" x="185" y="138">AUTHORITY CONTEXT</text>
+  <text class="n" x="298" y="100">130</text>
+
+  <!-- 114 rule: the gate between authority and sovereign context -->
+  <rect x="110" y="212" width="150" height="48" rx="4" fill="#ffffff" stroke="#000" stroke-width="4"/>
+  <text class="tb" x="185" y="242" font-size="15">RULE</text>
+  <text class="n" x="248" y="206">114</text>
+
+  <!-- blocked path: authority cannot read the sovereign context -->
+  <line class="dl" x1="185" y1="160" x2="185" y2="212" marker-end="url(#a)"/>
+  <line class="dl" x1="185" y1="260" x2="185" y2="286"/>
+  <circle cx="185" cy="300" r="14" fill="#ffffff" stroke="#000" stroke-width="2.5"/>
+  <line x1="176" y1="291" x2="194" y2="309" stroke="#000" stroke-width="2.5"/>
+  <line x1="194" y1="291" x2="176" y2="309" stroke="#000" stroke-width="2.5"/>
+  <text class="ts" x="185" y="330">authority cannot read</text>
+  <text class="ts" x="185" y="346">the sovereign context</text>
+
+  <!-- participant boundary + 132 sovereign context -->
+  <rect class="dash" x="66" y="362" width="250" height="132" rx="8"/>
+  <text class="ts" x="191" y="382" font-style="italic">PARTICIPANT'S DEVICE / ACCOUNT</text>
+  <rect class="dash" x="96" y="400" width="190" height="56" rx="6"/>
+  <text class="tb" x="191" y="433">SOVEREIGN CONTEXT</text>
+  <text class="n" x="50" y="432">132</text>
+
+  <!-- 134 composition -->
+  <rect class="box" x="440" y="206" width="150" height="84" rx="6"/>
+  <text class="tb" x="515" y="253">COMPOSITION</text>
+  <text class="n" x="576" y="200">134</text>
+
+  <!-- individualized operation -->
+  <rect class="box" x="700" y="210" width="210" height="76" rx="6"/>
+  <text class="tb" x="805" y="242">INDIVIDUALIZED</text>
+  <text class="tb" x="805" y="262">OPERATION</text>
+
+  <!-- both contexts feed composition (labels kept clear of the arrows) -->
+  <line class="ln" x1="280" y1="132" x2="440" y2="230" marker-end="url(#a)"/>
+  <text class="ts" x="372" y="150">authority context in</text>
+
+  <line class="ln" x1="286" y1="428" x2="440" y2="266" marker-end="url(#a)"/>
+  <text class="ts" x="392" y="392">sovereign context in,</text>
+  <text class="ts" x="392" y="408">composed at run time</text>
+
+  <line class="ln" x1="590" y1="248" x2="700" y2="248" marker-end="url(#a)"/>
+  <text class="ts" x="805" y="318" font-style="italic">authority never took custody of 132</text>
+
+  <text x="500" y="540" font-size="22" font-weight="bold" text-anchor="middle">FIG. 3</text>
+</svg>

@@ -1,5 +1,16 @@
 # Membrane Kit - the commons your oracle should stand on
 
+> **Canonical source: [github.com/Techniq42/fls-membrane](https://github.com/Techniq42/fls-membrane).**
+> If you're reading this anywhere else, it's a **mirror** - the authoritative version,
+> security fixes, and signed/tagged releases live only at the canonical repo. Pull from there,
+> not from a fork, before you stand anything up.
+>
+> This repo also carries the project's **commons disclosure** (a defensive publication - text
+> CC BY 4.0, code Apache-2.0). The citable, authoritative version is the **Zenodo DOI** paired
+> with the matching **tagged GitHub release** here; verify any copy against those two, never
+> against an untagged mirror. The full record (*Solid Ground*, the five applications as filed,
+> and the consolidated specification) lives in [`disclosure/`](disclosure/).
+
 An agent with a file corpus + memory + skills is a good **oracle**: you ask, it
 answers from its *private* store. What it's missing is **shared, queryable,
 multi-writer state** - the thing that turns an oracle into a **workspace**.

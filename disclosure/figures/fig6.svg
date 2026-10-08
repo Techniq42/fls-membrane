@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="1000" height="600" fill="#ffffff"/>
+  <style>
+    .frame{ fill:#ffffff; stroke:#000; stroke-width:2; }
+    .ctr  { fill:#ffffff; stroke:#000; stroke-width:3; }
+    .tb   { font-size:14px; fill:#000; text-anchor:middle; font-weight:bold; }
+    .ts   { font-size:12px; fill:#000; text-anchor:middle; }
+    .ln   { stroke:#000; stroke-width:1.5; fill:none; stroke-dasharray:5 4; }
+  </style>
+
+  <!-- connectors center to frames (drawn first, behind) -->
+  <line class="ln" x1="410" y1="278" x2="292" y2="200"/>
+  <line class="ln" x1="590" y1="278" x2="708" y2="200"/>
+  <line class="ln" x1="410" y1="322" x2="292" y2="404"/>
+  <line class="ln" x1="590" y1="322" x2="708" y2="404"/>
+  <text class="ts" x="352" y="238" font-style="italic">self-similar</text>
+  <text class="ts" x="648" y="238" font-style="italic">self-similar</text>
+
+  <!-- reusable motif: seats (open) + rule (filled) + records -->
+  <g id="motif">
+    <rect x="0" y="24" width="160" height="58" rx="6" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <line x1="12" y1="46" x2="70" y2="46" stroke="#000" stroke-width="1"/>
+    <line x1="90" y1="46" x2="148" y2="46" stroke="#000" stroke-width="1"/>
+    <line x1="12" y1="64" x2="70" y2="64" stroke="#000" stroke-width="1"/>
+    <line x1="90" y1="64" x2="148" y2="64" stroke="#000" stroke-width="1"/>
+    <circle cx="80" cy="53" r="9" fill="#000"/>
+    <circle cx="24" cy="8" r="9" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <circle cx="136" cy="8" r="9" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <line x1="28" y1="16" x2="73" y2="46" stroke="#000" stroke-width="1.2"/>
+    <line x1="132" y1="16" x2="87" y2="46" stroke="#000" stroke-width="1.2"/>
+  </g>
+
+  <!-- SERVER -->
+  <rect class="frame" x="70" y="64" width="220" height="150" rx="6"/>
+  <text class="tb" x="180" y="90">SERVER</text>
+  <use href="#motif" x="100" y="110"/>
+
+  <!-- CLASSROOM -->
+  <rect class="frame" x="710" y="64" width="220" height="150" rx="6"/>
+  <text class="tb" x="820" y="90">CLASSROOM</text>
+  <use href="#motif" x="740" y="110"/>
+
+  <!-- HANDSET -->
+  <rect class="frame" x="70" y="388" width="220" height="150" rx="6"/>
+  <text class="tb" x="180" y="414">HANDSET (no server)</text>
+  <use href="#motif" x="100" y="434"/>
+
+  <!-- PHYSICAL-RESOURCE NETWORK -->
+  <rect class="frame" x="710" y="388" width="220" height="150" rx="6"/>
+  <text class="tb" x="820" y="414" font-size="12.5">PHYSICAL-RESOURCE NETWORK</text>
+  <use href="#motif" x="740" y="434"/>
+
+  <!-- center -->
+  <rect class="ctr" x="400" y="250" width="200" height="100" rx="8"/>
+  <text class="tb" x="500" y="284">ONE COORDINATION</text>
+  <text class="tb" x="500" y="302">PATTERN</text>
+  <text class="ts" x="500" y="324" font-style="italic">same interlock, any body</text>
+
+  <!-- key -->
+  <text class="ts" x="500" y="576" font-style="italic">each frame is the same motif — open circles = seats, filled circle = the rule (114), lines = records</text>
+
+  <text x="500" y="596" font-size="14" font-weight="bold" text-anchor="middle">FIG. 6</text>
+</svg>

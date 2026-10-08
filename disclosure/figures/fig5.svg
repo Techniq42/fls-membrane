@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="1000" height="580" fill="#ffffff"/>
+  <style>
+    .box  { fill:#ffffff; stroke:#000; stroke-width:2; }
+    .dash { fill:#ffffff; stroke:#000; stroke-width:1.5; stroke-dasharray:3 6; }
+    .tb   { font-size:13px; fill:#000; text-anchor:middle; font-weight:bold; }
+    .ts   { font-size:12px; fill:#000; text-anchor:middle; }
+    .n    { font-size:13px; fill:#000; font-style:italic; text-anchor:middle; }
+    .ln   { stroke:#000; stroke-width:2; fill:none; }
+    .yn   { font-size:12px; fill:#000; font-weight:bold; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="7.5" refY="3.5" orient="auto">
+      <path d="M0,0 L8,3.5 L0,7 z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- 140 loop frame -->
+  <rect class="dash" x="80" y="46" width="520" height="500" rx="10"/>
+  <text x="96" y="68" font-size="12.5" font-weight="bold">RECURSIVE GOAL-DIRECTED LOOP</text>
+  <text class="n" x="566" y="64">140</text>
+
+  <!-- GOAL -->
+  <rect class="box" x="350" y="84" width="180" height="46" rx="6"/>
+  <text class="tb" x="440" y="112">GOAL</text>
+
+  <!-- DERIVE STEPS -->
+  <rect class="box" x="326" y="158" width="228" height="50" rx="6"/>
+  <text class="tb" x="440" y="180">DERIVE STEPS</text>
+  <text class="ts" x="440" y="198">(reverse-navigate from goal)</text>
+
+  <!-- GENERATE -->
+  <rect class="box" x="350" y="236" width="180" height="46" rx="6"/>
+  <text class="tb" x="440" y="264">GENERATE OUTPUT</text>
+
+  <!-- ASSESS -->
+  <rect class="box" x="326" y="310" width="228" height="50" rx="6"/>
+  <text class="tb" x="440" y="332">ASSESS vs</text>
+  <text class="ts" x="440" y="350">completion criterion</text>
+
+  <!-- decision diamond -->
+  <polygon class="box" points="440,388 528,436 440,484 352,436"/>
+  <text class="ts" x="440" y="432">criterion</text>
+  <text class="ts" x="440" y="448">met?</text>
+
+  <!-- REGENERATE (no branch) -->
+  <rect class="box" x="104" y="412" width="176" height="48" rx="6"/>
+  <text class="tb" x="192" y="434">REGENERATE</text>
+  <text class="ts" x="192" y="451">targeted output</text>
+
+  <!-- MASTERY (yes branch) -->
+  <rect class="box" x="350" y="500" width="180" height="46" rx="6"/>
+  <text class="tb" x="440" y="528">MASTERY / DONE</text>
+
+  <!-- spine arrows -->
+  <line class="ln" x1="440" y1="130" x2="440" y2="158" marker-end="url(#a)"/>
+  <line class="ln" x1="440" y1="208" x2="440" y2="236" marker-end="url(#a)"/>
+  <line class="ln" x1="440" y1="282" x2="440" y2="310" marker-end="url(#a)"/>
+  <line class="ln" x1="440" y1="360" x2="440" y2="388" marker-end="url(#a)"/>
+
+  <!-- no branch: diamond -> regenerate -->
+  <line class="ln" x1="352" y1="436" x2="280" y2="436" marker-end="url(#a)"/>
+  <text class="yn" x="300" y="426">no</text>
+  <!-- regenerate loops back up to assess -->
+  <line class="ln" x1="192" y1="412" x2="192" y2="335" />
+  <line class="ln" x1="192" y1="335" x2="326" y2="335" marker-end="url(#a)"/>
+
+  <!-- yes branch: diamond -> mastery -->
+  <line class="ln" x1="440" y1="484" x2="440" y2="500" marker-end="url(#a)"/>
+  <text class="yn" x="458" y="496">yes</text>
+
+  <!-- write-back to both records -->
+  <line class="ln" x1="530" y1="518" x2="700" y2="470" marker-end="url(#a)"/>
+  <line class="ln" x1="530" y1="524" x2="700" y2="536" marker-end="url(#a)"/>
+  <text class="ts" x="632" y="500" font-style="italic">write-back</text>
+
+  <rect class="box" x="700" y="446" width="220" height="48" rx="6"/>
+  <text class="ts" x="810" y="474">PARTICIPANT CONTEXT</text>
+  <text class="n" x="912" y="442">132</text>
+  <rect class="box" x="700" y="512" width="220" height="48" rx="6"/>
+  <text class="ts" x="810" y="534">AUTHORITY MONITORING</text>
+  <text class="ts" x="810" y="550">RECORD</text>
+
+  <text class="ts" x="810" y="418" font-style="italic">both learn from the same result</text>
+
+  <text x="500" y="574" font-size="20" font-weight="bold" text-anchor="middle">FIG. 5</text>
+</svg>
