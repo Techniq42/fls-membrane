@@ -4,6 +4,7 @@
 
 > **Published October 8, 2026 by Shannon Dobbs.**
 > **Prose licensed Creative Commons Attribution 4.0 International (CC BY 4.0). The reference code is Apache 2.0.**
+> **Citable record: [doi.org/10.5281/zenodo.23251327](https://doi.org/10.5281/zenodo.23251327) · full record and code: [github.com/Techniq42/fls-membrane](https://github.com/Techniq42/fls-membrane/tree/main/disclosure)**
 > **Every right I hold in this methodology, and every right held in it by Fellowship of Living Systems, the company I own that keeps the reference code, is dedicated under those licenses.**
 >
 > This document gives a methodology to the public. I am publishing it whole, with nothing held back, so that it stands as prior art and stays free for anyone to read, build on, and improve, and so that no one can fence it off.

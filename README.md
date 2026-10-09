@@ -6,7 +6,8 @@
 > not from a fork, before you stand anything up.
 >
 > This repo also carries the project's **commons disclosure** (a defensive publication - text
-> CC BY 4.0, code Apache-2.0). The citable, authoritative version is the **Zenodo DOI** paired
+> CC BY 4.0, code Apache-2.0). The citable, authoritative version is the **Zenodo DOI**
+> ([10.5281/zenodo.23251327](https://doi.org/10.5281/zenodo.23251327)) paired
 > with the matching **tagged GitHub release** here; verify any copy against those two, never
 > against an untagged mirror. The full record (*Solid Ground*, the five applications as filed,
 > and the consolidated specification) lives in [`disclosure/`](disclosure/).

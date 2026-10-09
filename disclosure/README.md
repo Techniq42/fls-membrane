@@ -18,6 +18,6 @@ In December 2025 I filed five patent applications on a way for people and machin
 
 **Rights.** Every right I hold in this work, and every right held by Fellowship of Living Systems, the company I own that keeps the reference code, is dedicated under these licenses: prose and drawings under Creative Commons Attribution 4.0 International, code under the Apache License 2.0. Carry the attribution with the work. By December 2026 I will state here whether I also bind myself with a formal pledge never to assert a patent right in this work, or whether a United States patent is held by a partner for the commons.
 
-**Citing.** Dobbs, S. (2026). *Solid Ground: the complete record.* The citable version is the Zenodo DOI paired with the matching tagged release of this repository. Verify any copy against those two.
+**Citing.** Dobbs, S. (2026). *Solid Ground: the complete record* (v1.0). Zenodo. [https://doi.org/10.5281/zenodo.23251327](https://doi.org/10.5281/zenodo.23251327) (all versions; v1.0 is 10.5281/zenodo.23251328). The citable version is the Zenodo DOI paired with the matching tagged release of this repository.
 
-**Read it online.** shannondobbs.com/solid-ground
+**Read it online.** [shannondobbs.com/solid-ground](https://www.shannondobbs.com/solid-ground/)
