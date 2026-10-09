@@ -5,8 +5,7 @@
   "description": "<p>A fractal, governed shared-memory methodology for people and machines, given to the commons. The complete record: (1) <i>Solid Ground</i>, the methodology in plain language with 38 precisely stated statements; (2) the five United States patent applications filed December 2025 (19/409,604; 19/411,766; 63/935,543; 63/935,743; 63/940,998), published as filed with personal and third-party details removed; (3) the consolidated specification with drawings; (4) the reference code (Membrane Kit); (5) a technical supplement with worked, tested detail for the software method and the physical systems, every component credited to the people who demonstrated it. Corrections from v1.0 are listed in disclosure/ERRATA.md. Published as a defensive publication so the methodology stays open for anyone to use and build on. Text CC BY 4.0; code Apache 2.0.</p>",
   "creators": [
     {
-      "name": "Dobbs, Shannon",
-      "affiliation": "Fellowship of Living Systems"
+      "name": "Dobbs, Shannon"
     }
   ],
   "license": "cc-by-4.0",
