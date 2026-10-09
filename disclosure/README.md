@@ -14,6 +14,8 @@ In December 2025 I filed five patent applications on a way for people and machin
 
 **Start with Volume 1.** Volume 2 is the historical record and carries the most detail on the physical systems (the off-grid node, the food infrastructure, the hubs and the sensory-assist interface). Volume 3 is the most complete technical statement of the coordination method.
 
+**Already running.** The interview that draws out a person's own skill file, the first step of the learning method, is published as the Regenerative Gem at [shannondobbs.com/regenerative-gem](https://shannondobbs.com/regenerative-gem/).
+
 **Rights.** Every right I hold in this work, and every right held by Fellowship of Living Systems, the company I own that keeps the reference code, is dedicated under these licenses: prose and drawings under Creative Commons Attribution 4.0 International, code under the Apache License 2.0. Carry the attribution with the work. By December 2026 I will state here whether I also bind myself with a formal pledge never to assert a patent right in this work, or whether a United States patent is held by a partner for the commons.
 
 **Citing.** Dobbs, S. (2026). *Solid Ground: the complete record.* The citable version is the Zenodo DOI paired with the matching tagged release of this repository. Verify any copy against those two.
