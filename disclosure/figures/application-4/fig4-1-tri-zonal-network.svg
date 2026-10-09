@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 890" width="1100" height="890">
+<style>
+.l{stroke:#000;fill:none;stroke-width:2}
+.thin{stroke:#000;fill:none;stroke-width:1.2}
+.f{stroke:#000;fill:#fff;stroke-width:2}
+.d{stroke:#000;fill:none;stroke-width:2;stroke-dasharray:8 6}
+.dd{stroke:#000;fill:none;stroke-width:1.6;stroke-dasharray:14 5 3 5}
+.t{font:13px Arial,Helvetica,sans-serif;fill:#000}
+.s{font:11px Arial,Helvetica,sans-serif;fill:#000}
+.n{font:bold 13px Arial,Helvetica,sans-serif;fill:#000}
+.h{font:bold 20px Arial,Helvetica,sans-serif;fill:#000}
+</style>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker>
+<pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#000" stroke-width="1"/></pattern>
+</defs>
+<rect width="1100" height="890" fill="#fff"/>
+<text x="550" y="40" text-anchor="middle" class="h">FIG. 1 — Tri-Zonal Network at Watershed Scale</text>
+
+<!-- 104 barrier: mountain ridge -->
+<path class="l" d="M175,110 L150,150 L185,190 L145,240 L190,290 L150,340 L195,390 L150,440 L190,490 L145,540 L185,590 L150,640 L180,700"/>
+<path class="thin" d="M150,150 L165,170 M145,240 L165,262 M150,340 L170,362 M150,440 L168,462 M145,540 L165,562 M150,640 L166,660"/>
+
+<!-- 150 satellite hub beyond barrier -->
+<rect class="f" x="40" y="380" width="70" height="46"/>
+<text x="75" y="408" text-anchor="middle" class="s">local hub</text>
+<rect class="l" x="45" y="470" width="60" height="38" style="fill:url(#hatch)"/>
+<path class="l" marker-end="url(#a)" d="M75,470 L75,430"/>
+
+<!-- 102 watershed boundary -->
+<path class="dd" d="M215,110 C420,80 760,90 980,120 C1060,140 1075,260 1060,400 C1050,560 1040,690 900,725 C700,760 420,760 260,720 C205,690 200,560 210,420 C215,300 200,180 215,110 z"/>
+
+<!-- 106 river -->
+<path class="thin" d="M230,150 C320,210 300,300 420,330 C520,355 640,560 760,600 C860,630 960,650 1040,690"/>
+<path class="thin" d="M236,144 C326,204 306,294 426,322 C528,347 648,552 766,592 C866,622 966,642 1046,682"/>
+
+<!-- 110 urban area -->
+<circle class="l" cx="455" cy="380" r="160" stroke-dasharray="3 5"/>
+<!-- 112 urban hub -->
+<rect class="f" x="415" y="352" width="80" height="56"/>
+<text x="455" y="377" text-anchor="middle" class="s">URBAN</text>
+<text x="455" y="392" text-anchor="middle" class="s">HUB</text>
+<!-- 114 neighborhood nodes -->
+<g class="f">
+<circle cx="365" cy="285" r="15"/><circle cx="545" cy="282" r="15"/><circle cx="585" cy="395" r="15"/>
+<circle cx="530" cy="490" r="15"/><circle cx="375" cy="478" r="15"/><circle cx="325" cy="380" r="15"/>
+</g>
+<g class="thin">
+<path d="M415,365 L378,293"/><path d="M495,362 L533,292"/><path d="M495,388 L570,395"/>
+<path d="M480,408 L522,477"/><path d="M430,408 L386,466"/><path d="M415,380 L340,380"/>
+</g>
+<!-- 116 generators (triangles) -->
+<g class="f">
+<path d="M300,230 l14,-24 l14,24 z"/><path d="M600,240 l14,-24 l14,24 z"/><path d="M620,470 l14,-24 l14,24 z"/><path d="M300,520 l14,-24 l14,24 z"/>
+</g>
+<path class="l" marker-end="url(#a)" d="M320,234 L355,270"/>
+<path class="l" marker-end="url(#a)" d="M605,240 L560,272"/>
+<path class="l" marker-end="url(#a)" d="M624,466 L597,407"/>
+<path class="l" marker-end="url(#a)" d="M322,516 L362,489"/>
+
+<!-- 120 rural strategic processing center -->
+<path class="f" d="M820,300 l40,0 l20,35 l-20,35 l-40,0 l-20,-35 z"/>
+<text x="840" y="331" text-anchor="middle" class="s">RURAL</text>
+<text x="840" y="346" text-anchor="middle" class="s">CENTER</text>
+<!-- 122 farms -->
+<rect class="l" x="760" y="500" width="100" height="60" style="fill:url(#hatch)"/>
+<rect class="l" x="900" y="480" width="100" height="60" style="fill:url(#hatch)"/>
+<rect class="l" x="910" y="170" width="100" height="60" style="fill:url(#hatch)"/>
+
+<!-- material flows -->
+<path class="l" marker-end="url(#a)" d="M497,372 C620,330 700,320 796,330"/>
+<path class="l" marker-end="url(#a)" d="M840,372 C835,420 815,460 810,496"/>
+<path class="l" marker-end="url(#a)" d="M862,372 C900,410 930,440 945,476"/>
+<path class="l" marker-end="url(#a)" d="M862,300 C890,260 920,245 945,234"/>
+<path class="l" marker-end="url(#a)" d="M760,540 C660,560 560,470 497,405"/>
+<!-- 142 infiltration -->
+<g class="thin">
+<path d="M790,566 q6,10 0,20 q-6,10 0,20" marker-end="url(#a)"/>
+<path d="M830,566 q6,10 0,20 q-6,10 0,20" marker-end="url(#a)"/>
+<path d="M940,546 q6,10 0,20 q-6,10 0,20" marker-end="url(#a)"/>
+</g>
+
+<!-- 144 pass protocol: data only across barrier -->
+<path class="d" marker-end="url(#a)" d="M415,370 C330,330 230,360 116,398"/>
+<!-- 146 blocked goods transfer -->
+<path class="l" d="M300,430 L205,440"/>
+<path class="l" d="M232,422 l22,22 M254,422 l-22,22" stroke-width="3"/>
+
+<!-- reference numerals with leaders -->
+<g class="thin">
+<path d="M1010,140 L1035,95"/><path d="M150,200 L118,175"/><path d="M75,380 L75,350"/><path d="M75,508 L75,530"/>
+<path d="M318,480 L272,520"/><path d="M455,408 L455,440"/><path d="M590,290 L640,270"/>
+<path d="M628,238 L668,220"/><path d="M880,335 L930,335"/><path d="M810,560 L810,600"/>
+<path d="M650,330 L668,300"/><path d="M640,520 L660,548"/><path d="M842,600 L872,620"/>
+<path d="M270,368 L268,300"/><path d="M244,444 L244,470"/><path d="M1020,690 L1050,720"/>
+<path d="M827,425 L780,440"/>
+</g>
+<g class="n">
+<text x="1038" y="90">102</text><text x="95" y="172">104</text><text x="62" y="345">150</text><text x="62" y="546">152</text>
+<text x="244" y="536">110</text><text x="442" y="456">112</text><text x="643" y="268">114</text>
+<text x="671" y="216">116</text><text x="934" y="340">120</text><text x="798" y="616">122</text>
+<text x="660" y="296">132</text><text x="662" y="562">140</text><text x="874" y="636">142</text>
+<text x="252" y="296">144</text><text x="230" y="486">146</text><text x="1052" y="736">106</text>
+<text x="745" y="446">138</text>
+</g>
+
+<!-- legend -->
+<rect class="thin" x="40" y="760" width="1020" height="118"/>
+<g class="s">
+<path class="l" marker-end="url(#a)" d="M55,780 L95,780"/><text x="102" y="784">material flow</text>
+<path class="d" marker-end="url(#a)" d="M55,802 L95,802"/><text x="102" y="806">data only (recipes, G-code, licenses)</text>
+<path class="dd" d="M55,822 L95,822"/><text x="102" y="826">watershed boundary</text>
+<text x="320" y="782">102 watershed / bioregion · 104 geographic barrier (ridge, pass, ocean) · 106 river system · 110 urban area</text>
+<text x="320" y="800">112 Urban Metabolic Hub (Tier 2) · 114 Neighborhood Distribution Nodes (Tier 1) · 116 surplus generators (venues, hotels, hospitals, grocers)</text>
+<text x="320" y="818">120 Rural Strategic Processing Center (Tier 3) · 122 farms · 132 organics and packaging feedstock to Tier 3 · 138 soil amendment to farms</text>
+<text x="320" y="836">140 surplus harvest to hub · 142 soil water retention and aquifer recharge · 144 Pass Protocol: recipes cross the barrier as data only</text>
+<text x="320" y="854">146 no finished goods or empty packaging cross the barrier · 150 hub beyond the barrier, manufacturing locally · 152 its local inputs</text>
+</g>
+</svg>

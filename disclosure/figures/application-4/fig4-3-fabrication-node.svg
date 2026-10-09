@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 910" width="1100" height="910">
+<style>
+.l{stroke:#000;fill:none;stroke-width:2}
+.thin{stroke:#000;fill:none;stroke-width:1.2}
+.f{stroke:#000;fill:#fff;stroke-width:2}
+.d{stroke:#000;fill:none;stroke-width:1.8;stroke-dasharray:7 5}
+.s{font:11px Arial,Helvetica,sans-serif;fill:#000}
+.n{font:bold 13px Arial,Helvetica,sans-serif;fill:#000}
+.h{font:bold 20px Arial,Helvetica,sans-serif;fill:#000}
+</style>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker>
+</defs>
+<rect width="1100" height="910" fill="#fff"/>
+<text x="550" y="40" text-anchor="middle" class="h">FIG. 3 — Multi-Modal Fabrication Node (one chassis, many material classes)</text>
+
+<!-- 300 enclosure -->
+<rect class="f" x="300" y="90" width="460" height="520"/>
+<rect class="thin" x="320" y="110" width="420" height="380"/>
+<!-- 302 gantry -->
+<path class="l" d="M330,140 L730,140" stroke-width="4"/>
+<rect class="f" x="500" y="128" width="60" height="24"/>
+<path class="l" d="M335,130 L335,480 M725,130 L725,480" stroke-width="3"/>
+<!-- active tool on carriage -->
+<rect class="f" x="512" y="152" width="36" height="58"/>
+<path class="l" d="M530,210 L530,228"/>
+<path class="l" d="M522,222 L538,222 L530,234 z" fill="#000"/>
+<!-- 310 build plate -->
+<rect class="f" x="400" y="420" width="260" height="16"/>
+<path class="l" d="M530,436 L530,470 M470,470 L590,470"/>
+<!-- part being printed: gear -->
+<path class="l" d="M500,420 l0,-14 l8,0 l0,-8 l10,0 l0,8 l14,0 l0,-8 l10,0 l0,8 l8,0 l0,14"/>
+<!-- 304 tool dock with heads -->
+<path class="l" d="M345,250 L345,400"/>
+<g class="f">
+<rect x="350" y="255" width="40" height="30"/><rect x="350" y="290" width="40" height="30"/>
+<rect x="350" y="325" width="40" height="30"/><rect x="350" y="360" width="40" height="30"/>
+</g>
+<g class="s"><text x="370" y="274" text-anchor="middle">T1</text><text x="370" y="309" text-anchor="middle">T2</text><text x="370" y="344" text-anchor="middle">T3</text><text x="370" y="379" text-anchor="middle">T4</text></g>
+<!-- feeds on side -->
+<rect class="f" x="770" y="140" width="70" height="60"/><text x="805" y="168" text-anchor="middle" class="s">filament</text><text x="805" y="182" text-anchor="middle" class="s">dry box</text>
+<rect class="f" x="770" y="225" width="70" height="60"/><text x="805" y="253" text-anchor="middle" class="s">paste</text><text x="805" y="267" text-anchor="middle" class="s">cartridge</text>
+<rect class="f" x="770" y="310" width="70" height="60"/><text x="805" y="338" text-anchor="middle" class="s">pellet</text><text x="805" y="352" text-anchor="middle" class="s">hopper</text>
+<path class="thin" d="M770,170 C700,170 640,160 560,170 M770,255 C700,255 640,200 560,185 M770,340 C700,330 640,230 560,200"/>
+<!-- 320 controller -->
+<rect class="f" x="320" y="510" width="140" height="80"/><text x="390" y="545" text-anchor="middle" class="s">controller</text><text x="390" y="559" text-anchor="middle" class="s">+ job queue</text>
+<path class="d" marker-end="url(#a)" d="M200,550 L318,550"/>
+<rect class="f" x="60" y="520" width="140" height="60"/><text x="130" y="546" text-anchor="middle" class="s">signed job</text><text x="130" y="560" text-anchor="middle" class="s">(see FIG. 4)</text>
+<!-- chamber heater -->
+<rect class="thin" x="600" y="520" width="140" height="70"/><text x="670" y="552" text-anchor="middle" class="s">chamber heat +</text><text x="670" y="566" text-anchor="middle" class="s">fume filtration</text>
+
+<!-- 330 waste-derived feedstock line -->
+<g class="f">
+<rect x="880" y="430" width="80" height="44"/><rect x="880" y="490" width="80" height="44"/><rect x="880" y="550" width="80" height="44"/><rect x="880" y="610" width="80" height="44"/>
+</g>
+<g class="s"><text x="920" y="456" text-anchor="middle">shred</text><text x="920" y="516" text-anchor="middle">dry</text><text x="920" y="572" text-anchor="middle">compound</text><text x="920" y="586" text-anchor="middle">(binder)</text><text x="920" y="636" text-anchor="middle">pelletize</text></g>
+<g class="l"><path marker-end="url(#a)" d="M920,474 L920,488"/><path marker-end="url(#a)" d="M920,534 L920,548"/><path marker-end="url(#a)" d="M920,594 L920,608"/></g>
+<path class="l" marker-end="url(#a)" d="M960,632 C1010,600 1000,350 842,340"/>
+<rect class="thin" x="870" y="380" width="100" height="34"/><text x="920" y="401" text-anchor="middle" class="s">facility waste</text>
+<path class="l" marker-end="url(#a)" d="M920,414 L920,428"/>
+
+<!-- 340 post-processing -->
+<rect class="f" x="300" y="680" width="150" height="70"/><text x="375" y="708" text-anchor="middle" class="s">debind +</text><text x="375" y="722" text-anchor="middle" class="s">sinter furnace</text>
+<rect class="f" x="470" y="680" width="130" height="70"/><text x="535" y="715" text-anchor="middle" class="s">ceramic kiln</text>
+<rect class="f" x="620" y="680" width="140" height="70"/><text x="690" y="708" text-anchor="middle" class="s">cure / dry /</text><text x="690" y="722" text-anchor="middle" class="s">food-safe wash</text>
+<path class="l" marker-end="url(#a)" d="M530,610 L530,640 L375,640 L375,678"/>
+<path class="l" marker-end="url(#a)" d="M530,640 L535,678"/>
+<path class="l" marker-end="url(#a)" d="M530,640 L690,640 L690,678"/>
+<!-- outputs -->
+<g class="s">
+<text x="375" y="780" text-anchor="middle">metal repair parts</text><text x="375" y="794" text-anchor="middle">(gears, brackets)</text>
+<text x="535" y="780" text-anchor="middle">molds, containers</text>
+<text x="690" y="780" text-anchor="middle">packaging, polymer</text><text x="690" y="794" text-anchor="middle">parts</text>
+</g>
+<g class="l"><path marker-end="url(#a)" d="M375,750 L375,766"/><path marker-end="url(#a)" d="M535,750 L535,766"/><path marker-end="url(#a)" d="M690,750 L690,766"/></g>
+
+<!-- numerals -->
+<g class="thin">
+<path d="M300,100 L250,80"/><path d="M640,140 L680,110"/><path d="M548,180 L600,190"/><path d="M345,320 L280,320"/>
+<path d="M660,428 L700,410"/><path d="M840,170 L870,150"/><path d="M320,560 L270,610"/><path d="M960,450 L1000,440"/>
+<path d="M300,715 L250,715"/><path d="M200,566 L170,610"/>
+</g>
+<g class="n">
+<text x="215" y="80">300</text><text x="684" y="106">302</text><text x="604" y="194">306</text><text x="244" y="324">304</text>
+<text x="704" y="408">310</text><text x="874" y="146">312</text><text x="240" y="626">320</text><text x="1004" y="438">330</text>
+<text x="212" y="719">340</text><text x="142" y="626">322</text>
+</g>
+
+<rect class="thin" x="40" y="812" width="1020" height="90"/>
+<g class="s">
+<text x="55" y="830">300 heated, filtered enclosure (one chassis) · 302 motion gantry · 304 tool dock: T1 bound-metal filament (stainless, titanium), T2 viscous paste (ceramic, food-grade silicone),</text>
+<text x="55" y="848">T3 pellet extruder (cellulose / starch biopolymer, recycled thermoplastic), T4 spare (fiber, support, food paste) · 306 active tool, swapped automatically per layer or per job</text>
+<text x="55" y="866">310 heated build plate · 312 material feeds · 320 controller and job queue · 322 signed job from the Federated Manufacturing Protocol</text><text x="55" y="884">330 feedstock made from the facility's own waste · 340 post-processing</text>
+<text x="55" y="900">(bound-metal parts are debound and sintered in a separate furnace; ceramics fired in a kiln). Any multi-toolhead machine of this class qualifies; it is a commodity category, not one product.</text>
+</g>
+</svg>

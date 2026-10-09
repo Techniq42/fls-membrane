@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 890" width="1100" height="890">
+<style>
+.l{stroke:#000;fill:none;stroke-width:2}
+.thin{stroke:#000;fill:none;stroke-width:1.2}
+.f{stroke:#000;fill:#fff;stroke-width:2}
+.d{stroke:#000;fill:none;stroke-width:1.8;stroke-dasharray:7 5}
+.t{font:12px Arial,Helvetica,sans-serif;fill:#000}
+.s{font:11px Arial,Helvetica,sans-serif;fill:#000}
+.n{font:bold 13px Arial,Helvetica,sans-serif;fill:#000}
+.h{font:bold 20px Arial,Helvetica,sans-serif;fill:#000}
+</style>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker>
+<pattern id="earth" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="#000" stroke-width="0.8"/></pattern>
+</defs>
+<rect width="1100" height="890" fill="#fff"/>
+<text x="550" y="40" text-anchor="middle" class="h">FIG. 2 — Urban Metabolic Hub, Cross-Section (Adaptive Reuse)</text>
+
+<!-- ground -->
+<rect x="60" y="600" width="980" height="120" style="fill:url(#earth)" stroke="none"/>
+<path class="l" d="M40,600 L1060,600"/>
+<!-- building shell -->
+<path class="l" d="M140,600 L140,170 L960,170 L960,600"/>
+<path class="l" d="M140,170 L550,120 L960,170"/>
+<!-- floors -->
+<path class="l" d="M140,420 L960,420"/>
+<path class="l" d="M140,330 L960,330"/>
+<path class="l" d="M140,250 L960,250"/>
+<!-- deep core walls (windowless) -->
+<path class="l" d="M400,170 L400,700 M700,170 L700,700" stroke-width="3"/>
+<!-- basement -->
+<path class="l" d="M400,700 L700,700"/>
+
+<!-- perimeter residential (upper floors) -->
+<g class="s">
+<text x="270" y="215" text-anchor="middle">residential</text><text x="270" y="295" text-anchor="middle">residential</text><text x="270" y="380" text-anchor="middle">residential</text>
+<text x="830" y="215" text-anchor="middle">residential</text><text x="830" y="295" text-anchor="middle">residential</text><text x="830" y="380" text-anchor="middle">residential</text>
+</g>
+<!-- windows on perimeter -->
+<g class="thin"><path d="M140,190 l0,40 M140,270 l0,40 M140,350 l0,50 M960,190 l0,40 M960,270 l0,40 M960,350 l0,50" stroke-width="5" stroke="#fff"/></g>
+<g class="thin"><rect x="134" y="190" width="6" height="40"/><rect x="134" y="270" width="6" height="40"/><rect x="134" y="350" width="6" height="50"/><rect x="960" y="190" width="6" height="40"/><rect x="960" y="270" width="6" height="40"/><rect x="960" y="350" width="6" height="50"/></g>
+
+<!-- vertical farm stack in core, upper floors -->
+<g class="thin">
+<rect x="430" y="185" width="240" height="20"/><rect x="430" y="215" width="240" height="20"/>
+<rect x="430" y="265" width="240" height="20"/><rect x="430" y="295" width="240" height="20"/>
+<rect x="430" y="345" width="240" height="20"/><rect x="430" y="375" width="240" height="20"/>
+</g>
+<g class="thin">
+<path d="M450,185 q5,-8 10,0 M500,185 q5,-8 10,0 M550,185 q5,-8 10,0 M600,185 q5,-8 10,0 M650,185 q5,-8 10,0"/>
+<path d="M450,265 q5,-8 10,0 M500,265 q5,-8 10,0 M550,265 q5,-8 10,0 M600,265 q5,-8 10,0 M650,265 q5,-8 10,0"/>
+<path d="M450,345 q5,-8 10,0 M500,345 q5,-8 10,0 M550,345 q5,-8 10,0 M600,345 q5,-8 10,0 M650,345 q5,-8 10,0"/>
+</g>
+
+<!-- ground floor high-ceiling: left perimeter retail + community kitchen -->
+<rect class="f" x="160" y="470" width="90" height="70"/><text x="205" y="500" text-anchor="middle" class="s">retail /</text><text x="205" y="514" text-anchor="middle" class="s">teaching</text>
+<rect class="f" x="270" y="470" width="110" height="70"/><text x="325" y="500" text-anchor="middle" class="s">community</text><text x="325" y="514" text-anchor="middle" class="s">kitchen</text>
+<!-- core: intake, blast chill, cold storage, racking -->
+<rect class="f" x="415" y="455" width="80" height="120"/><text x="455" y="505" text-anchor="middle" class="s">rescue</text><text x="455" y="519" text-anchor="middle" class="s">intake +</text><text x="455" y="533" text-anchor="middle" class="s">blast chill</text>
+<rect class="f" x="505" y="455" width="80" height="120"/><text x="545" y="512" text-anchor="middle" class="s">cold</text><text x="545" y="526" text-anchor="middle" class="s">storage</text>
+<g class="thin"><rect x="595" y="455" width="90" height="120"/><path d="M595,485 L685,485 M595,515 L685,515 M595,545 L685,545 M625,455 L625,575 M655,455 L655,575"/></g>
+<text x="640" y="592" text-anchor="middle" class="s">dry warehousing</text>
+<!-- right perimeter: oversized manufacturing lines -->
+<g class="f"><rect x="720" y="500" width="70" height="60"/><rect x="800" y="500" width="70" height="60"/></g>
+<text x="755" y="534" text-anchor="middle" class="s">line A</text><text x="835" y="534" text-anchor="middle" class="s">line B</text>
+<path class="l" d="M720,575 L880,575"/><circle class="thin" cx="735" cy="580" r="5"/><circle class="thin" cx="865" cy="580" r="5"/>
+<rect class="d" x="712" y="440" width="170" height="150" fill="none"/>
+<!-- docks -->
+<path class="l" d="M960,520 L1040,520 L1040,600"/>
+<rect class="f" x="975" y="540" width="50" height="60"/><text x="1000" y="574" text-anchor="middle" class="s">clean</text>
+<path class="l" d="M140,520 L60,520 L60,600"/>
+<rect class="f" x="75" y="540" width="50" height="60"/><text x="100" y="568" text-anchor="middle" class="s">organics</text><text x="100" y="582" text-anchor="middle" class="s">dock</text>
+
+<!-- basement: servers + heat exchanger -->
+<g class="f"><rect x="420" y="620" width="34" height="68"/><rect x="460" y="620" width="34" height="68"/><rect x="500" y="620" width="34" height="68"/></g>
+<g class="thin"><path d="M424,632 h26 M424,644 h26 M424,656 h26 M424,668 h26 M464,632 h26 M464,644 h26 M464,656 h26 M464,668 h26 M504,632 h26 M504,644 h26 M504,656 h26 M504,668 h26"/></g>
+<rect class="f" x="570" y="625" width="110" height="58"/><text x="625" y="650" text-anchor="middle" class="s">heat</text><text x="625" y="664" text-anchor="middle" class="s">exchanger</text>
+<path class="l" marker-end="url(#a)" d="M535,654 L568,654"/>
+
+<!-- waste heat loop -->
+<path class="d" marker-end="url(#a)" d="M680,640 C720,640 700,470 700,440" />
+<path class="d" marker-end="url(#a)" d="M625,625 L625,400"/>
+<path class="d" marker-end="url(#a)" d="M600,625 C560,560 380,420 300,400"/>
+<path class="d" marker-end="url(#a)" d="M660,625 C760,560 800,420 830,400"/>
+<path class="d" marker-end="url(#a)" d="M790,500 C770,470 720,430 680,400"/>
+
+<!-- reference numerals -->
+<g class="thin">
+<path d="M550,120 L550,90"/><path d="M200,250 L180,230"/><path d="M670,195 L740,150"/><path d="M400,450 L360,440"/>
+<path d="M205,540 L205,560"/><path d="M325,540 L325,560"/><path d="M455,455 L470,438"/><path d="M545,575 L545,592"/>
+<path d="M640,600 L640,612"/><path d="M882,470 L930,452"/><path d="M1000,600 L1020,620"/><path d="M100,600 L84,622"/>
+<path d="M437,688 L420,725"/><path d="M680,654 L740,690"/><path d="M590,560 L580,560"/><path d="M627,412 L668,412"/>
+</g>
+<g class="n">
+<text x="537" y="84">200</text><text x="154" y="226">202</text><text x="745" y="148">204</text><text x="320" y="436">206</text>
+<text x="192" y="576">208</text><text x="312" y="576">210</text><text x="472" y="436">212</text><text x="560" y="608">214</text>
+<text x="620" y="628">216</text><text x="934" y="450">218</text><text x="1022" y="636">220</text><text x="64" y="638">222</text>
+<text x="400" y="742">224</text><text x="744" y="704">226</text><text x="672" y="416">228</text>
+</g>
+
+<!-- legend -->
+<rect class="thin" x="40" y="755" width="1020" height="122"/>
+<g class="s">
+<path class="d" marker-end="url(#a)" d="M55,775 L95,775"/><text x="102" y="779">recovered heat (hydronic loop)</text>
+<text x="300" y="779">200 former anchor store or office block · 202 perimeter residential (windowed, upper floors) · 204 vertical farm in the windowless deep core</text>
+<text x="300" y="797">206 deep-core walls: interior zones without windows · 208 permanent retail + teaching (non-convertible) · 210 second, smaller community kitchen</text>
+<text x="300" y="815">212 rescue intake with blast chilling · 214 cold storage · 216 dry warehousing · 218 manufacturing lines sized 150-300% of baseline (surge capacity)</text>
+<text x="300" y="833">220 clean dock (food in, goods out) · 222 separate organics dock (waste in) · 224 server racks in the basement core · 226 heat exchanger</text>
+<text x="300" y="851">228 manufacturing and server waste heat feeding the farm and the residential perimeter. High ground-floor ceilings take industrial equipment.</text>
+<text x="300" y="869">Line A runs baseline product; line B (or a pause of A) takes rescue loads first, last-in-first-out, then resumes baseline.</text>
+</g>
+</svg>

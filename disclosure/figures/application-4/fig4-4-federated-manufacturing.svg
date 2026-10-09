@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 910" width="1100" height="910">
+<style>
+.l{stroke:#000;fill:none;stroke-width:2}
+.thin{stroke:#000;fill:none;stroke-width:1.2}
+.f{stroke:#000;fill:#fff;stroke-width:2}
+.d{stroke:#000;fill:none;stroke-width:1.8;stroke-dasharray:7 5}
+.s{font:11px Arial,Helvetica,sans-serif;fill:#000}
+.b{font:bold 12px Arial,Helvetica,sans-serif;fill:#000}
+.n{font:bold 13px Arial,Helvetica,sans-serif;fill:#000}
+.h{font:bold 20px Arial,Helvetica,sans-serif;fill:#000}
+</style>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker>
+</defs>
+<rect width="1100" height="910" fill="#fff"/>
+<text x="550" y="40" text-anchor="middle" class="h">FIG. 4 — Federated Manufacturing Protocol</text>
+
+<!-- 402 brand owner -->
+<rect class="f" x="40" y="90" width="170" height="70"/><text x="125" y="120" text-anchor="middle" class="b">BRAND OWNER</text><text x="125" y="138" text-anchor="middle" class="s">(any distance away)</text>
+<!-- 404 recipe packet -->
+<rect class="f" x="40" y="200" width="170" height="230"/>
+<text x="125" y="220" text-anchor="middle" class="b">RECIPE PACKET</text>
+<g class="s">
+<text x="52" y="244">· product id + version</text>
+<text x="52" y="262">· formulation with</text>
+<text x="62" y="278">tolerance bands</text>
+<text x="52" y="296">· allowed substitutions</text>
+<text x="52" y="314">· process parameters</text>
+<text x="52" y="332">· machine code (G-code)</text>
+<text x="52" y="350">· packaging print file</text>
+<text x="52" y="368">· QA spec + test points</text>
+<text x="52" y="386">· license scope, territory,</text>
+<text x="62" y="402">term, royalty rate</text>
+<text x="52" y="420">· signature</text>
+</g>
+<path class="l" marker-end="url(#a)" d="M125,160 L125,198"/>
+<!-- 406 barrier crossing -->
+<path class="l" d="M260,90 L245,130 L270,170 L245,215 L272,260 L245,305 L270,350 L248,395 L268,440"/>
+<path class="d" marker-end="url(#a)" d="M210,315 L330,315"/>
+<text x="268" y="300" text-anchor="middle" class="s">data only</text>
+
+<!-- hub side -->
+<rect class="f" x="335" y="270" width="150" height="90"/><text x="410" y="300" text-anchor="middle" class="b">VERIFY</text><text x="410" y="318" text-anchor="middle" class="s">signature, license,</text><text x="410" y="333" text-anchor="middle" class="s">territory, revocation list</text>
+<path class="l" marker-end="url(#a)" d="M410,360 L410,400"/>
+<rect class="f" x="335" y="402" width="150" height="90"/><text x="410" y="430" text-anchor="middle" class="b">LOCALIZE</text><text x="410" y="448" text-anchor="middle" class="s">map to local inputs</text><text x="410" y="463" text-anchor="middle" class="s">inside tolerance bands;</text><text x="410" y="478" text-anchor="middle" class="s">reject if out of band</text>
+<path class="l" marker-end="url(#a)" d="M485,447 L525,447"/>
+<rect class="f" x="527" y="402" width="150" height="90"/><text x="602" y="430" text-anchor="middle" class="b">SCHEDULE</text><text x="602" y="448" text-anchor="middle" class="s">baseline queue, with</text><text x="602" y="463" text-anchor="middle" class="s">rescue loads pre-empting</text><text x="602" y="478" text-anchor="middle" class="s">(shortest shelf life first)</text>
+<rect class="thin" x="527" y="300" width="150" height="56"/><text x="602" y="324" text-anchor="middle" class="s">rescue alert</text><text x="602" y="339" text-anchor="middle" class="s">(e.g. 500 kg, 6 h left)</text>
+<path class="l" marker-end="url(#a)" d="M602,356 L602,400"/>
+<rect class="thin" x="720" y="300" width="150" height="56"/><text x="795" y="324" text-anchor="middle" class="s">local ingredients +</text><text x="795" y="339" text-anchor="middle" class="s">rescued inputs</text>
+<path class="l" marker-end="url(#a)" d="M720,328 C640,370 520,380 470,402"/>
+
+<!-- 420 production cell of small automation modules -->
+<rect class="l" x="300" y="540" width="760" height="200" stroke-dasharray="4 4"/>
+<text x="680" y="560" text-anchor="middle" class="b">PRODUCTION CELL: small-format automation modules</text>
+<path class="l" marker-end="url(#a)" d="M602,492 L602,538"/>
+<g class="f">
+<rect x="320" y="580" width="110" height="80"/><rect x="450" y="580" width="110" height="80"/><rect x="580" y="580" width="110" height="80"/><rect x="710" y="580" width="110" height="80"/><rect x="840" y="580" width="110" height="80"/>
+</g>
+<g class="s">
+<text x="375" y="608" text-anchor="middle">benchtop mixer /</text><text x="375" y="622" text-anchor="middle">twin-screw extruder</text><text x="375" y="636" text-anchor="middle">or fryer / dehydrator</text>
+<text x="505" y="608" text-anchor="middle">dosing + filling</text><text x="505" y="622" text-anchor="middle">(auger, piston,</text><text x="505" y="636" text-anchor="middle">peristaltic)</text>
+<text x="635" y="608" text-anchor="middle">desktop robot arm</text><text x="635" y="622" text-anchor="middle">pick, place, pack</text>
+<text x="765" y="608" text-anchor="middle">package forming</text><text x="765" y="622" text-anchor="middle">+ print / seal</text><text x="765" y="636" text-anchor="middle">(FIG. 3 node)</text>
+<text x="895" y="608" text-anchor="middle">inline QA: check-</text><text x="895" y="622" text-anchor="middle">weigher, camera,</text><text x="895" y="636" text-anchor="middle">label verify</text>
+</g>
+<path class="l" d="M320,690 L950,690" stroke-width="3"/>
+<g class="thin"><circle cx="335" cy="696" r="6"/><circle cx="935" cy="696" r="6"/></g>
+<g class="l"><path marker-end="url(#a)" d="M430,620 L448,620"/><path marker-end="url(#a)" d="M560,620 L578,620"/><path marker-end="url(#a)" d="M690,620 L708,620"/><path marker-end="url(#a)" d="M820,620 L838,620"/></g>
+<text x="635" y="725" text-anchor="middle" class="s">modules share one conveyor + controller; commodity units from contract manufacturers (incl. Asia, Mexico), swapped as products change</text>
+
+<!-- QA decision -->
+<path class="f" d="M1000,600 l40,40 l-40,40 l-40,-40 z"/>
+<text x="1000" y="644" text-anchor="middle" class="b">spec?</text>
+<path class="l" d="M950,640 L960,640"/>
+<path class="l" marker-end="url(#a)" d="M1000,680 L1000,780"/>
+<rect class="f" x="930" y="782" width="140" height="50"/><text x="1000" y="804" text-anchor="middle" class="s">local distribution</text><text x="1000" y="819" text-anchor="middle" class="s">(nodes, FIG. 5)</text>
+<path class="l" marker-end="url(#a)" d="M1000,600 L1000,520 L900,520"/>
+<text x="1008" y="560" class="s">fail</text><text x="1008" y="764" class="s">pass</text>
+<rect class="thin" x="740" y="495" width="160" height="40"/><text x="820" y="513" text-anchor="middle" class="s">rework, or back to</text><text x="820" y="527" text-anchor="middle" class="s">feedstock / organics</text>
+
+<!-- usage meter + royalty -->
+<rect class="f" x="40" y="770" width="190" height="70"/><text x="135" y="796" text-anchor="middle" class="b">USAGE METER</text><text x="135" y="814" text-anchor="middle" class="s">units passed QA, per</text><text x="135" y="828" text-anchor="middle" class="s">product id + version</text>
+<path class="d" marker-end="url(#a)" d="M930,830 C800,900 420,900 232,826"/>
+<path class="d" marker-end="url(#a)" d="M80,770 C30,600 20,250 40,140"/>
+<text x="24" y="600" class="s" transform="rotate(-90 24 600)">signed usage report + royalty payment</text>
+<path class="d" marker-end="url(#a)" d="M210,140 C300,180 330,230 380,268"/>
+<text x="300" y="178" class="s">revoke / update</text>
+
+<!-- numerals -->
+<g class="thin">
+<path d="M210,110 L240,80"/><path d="M210,260 L240,240"/><path d="M262,440 L262,470"/><path d="M485,290 L520,270"/>
+<path d="M335,480 L300,500"/><path d="M677,470 L700,500"/><path d="M300,600 L270,600"/><path d="M1040,640 L1065,610"/>
+<path d="M1070,820 L1080,850"/><path d="M230,790 L265,770"/>
+</g>
+<g class="n">
+<text x="242" y="76">402</text><text x="242" y="236">404</text><text x="250" y="486">406</text><text x="522" y="266">410</text>
+<text x="266" y="512">412</text><text x="702" y="514">414</text><text x="234" y="604">420</text><text x="1060" y="604">430</text>
+<text x="1066" y="866">440</text><text x="268" y="766">450</text>
+</g>
+
+<rect class="thin" x="300" y="752" width="610" height="104" fill="#fff"/>
+<g class="s">
+<text x="312" y="770">402 brand or recipe owner · 404 signed recipe packet · 406 geographic barrier: only data crosses</text>
+<text x="312" y="788">410 verification at the local hub · 412 localization to bioregional inputs within tolerance</text>
+<text x="312" y="806">414 scheduler with last-in-first-out rescue pre-emption · 420 production cell of small,</text>
+<text x="312" y="824">low-cost automation modules · 430 quality gate against the packet's spec</text>
+<text x="312" y="842">440 local distribution · 450 usage meter: royalty flows back as data and payment</text>
+</g>
+</svg>
