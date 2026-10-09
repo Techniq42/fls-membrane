@@ -1,0 +1,89 @@
+--- a/add-caged-seat.sh
++++ b/add-caged-seat.sh
+@@ -12,12 +12,26 @@
+ #
+ # Run as an admin OS user with sudo. Requires: the membrane MCP server staged at $MCP_CMD,
+ # a Postgres role that grants the lane capabilities (here: membrane_app), and current_holon()
+-# from 03-hardening.sql (SECURITY DEFINER, keyed on session_user).
++# from 03-hardening.patched.sql (resolves current_user, then session_user, through a sealed view).
+ #
+ # Usage:
+ #   ./add-caged-seat.sh add    <seat> <holon> "<ssh-ed25519 AAAA... [comment]>"
+ #   ./add-caged-seat.sh list
+-#   ./add-caged-seat.sh revoke <seat>          # shut this valve; role/holon left intact
++#   ./add-caged-seat.sh revoke <seat>          # shut the valve AND end live sessions
++#   ./add-caged-seat.sh revoke <seat> --purge  # ...and remove role, holon mapping, OS user
++#
++# Seat names: role names are visible to every role in pg_roles. Provision OPAQUE
++# seat names (e.g. s_7f3a9c21) and keep any display name in the holder's own records.
++# --purge: after the revoke steps, deletes the holon mapping, reassigns anything the
++# role owns to store_owner, drops the role and removes the OS user. Rows the seat
++# wrote keep its (opaque) name as their author; nothing is deleted from the board.
++#
++# Volume 5 patch: the published revoke only emptied authorized_keys. That stops
++# NEW ssh sessions, but a session already running keeps its MCP server process
++# and its database connection, and peer auth would still let the OS user log in
++# to the database locally. Revoke now (1) sets the role NOLOGIN, (2) empties the
++# key, (3) kills the seat's processes, (4) terminates its database backends,
++# and (5) verifies nothing is left. SQL for steps 1 and 4: revoke-seat.sql.
+ set -euo pipefail
+ 
+ # The one command a caged key may run = launch the MCP server. Override for your layout.
+@@ -27,6 +41,7 @@
+ SAFE='^[a-z][a-z0-9_-]{1,30}$'
+ 
+ psql_su() { sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 "$@"; }
++HERE="$(cd "$(dirname "$0")" && pwd)"
+ 
+ case "${1:-}" in
+   add)
+@@ -45,6 +60,7 @@
+     echo "[2/3] DB role '$seat' -> holon '$holon' (inherits $GRANT_ROLE, NOT owner)"
+     psql_su -tAc "SELECT 1 FROM pg_roles WHERE rolname='$seat'" | grep -q 1 \
+       || psql_su -c "CREATE ROLE \"$seat\" LOGIN INHERIT;"
++    psql_su -c "ALTER ROLE \"$seat\" LOGIN;"          # re-admit a previously revoked seat
+     psql_su -c "GRANT \"$GRANT_ROLE\" TO \"$seat\";"
+     psql_su -c "INSERT INTO holon_roles(rolename,holon) VALUES('$seat','$holon') ON CONFLICT(rolename) DO UPDATE SET holon=EXCLUDED.holon;"
+ 
+@@ -66,11 +82,37 @@
+     done
+     ;;
+   revoke)
+-    seat="${2:?need the seat to revoke}"
++    seat="${2:?need the seat to revoke}"; purge="${3:-}"
+     [[ "$seat" =~ $SAFE ]] || { echo "ERROR: bad seat name" >&2; exit 2; }
+-    [[ -f "/home/$seat/.ssh/authorized_keys" ]] || { echo "no such seat key" >&2; exit 5; }
+-    sudo truncate -s 0 "/home/$seat/.ssh/authorized_keys"
+-    echo "valve shut for '$seat' (now keyless). Role/holon left intact; drop them manually to fully retire."
++    id "$seat" >/dev/null 2>&1 || { echo "no such seat user" >&2; exit 5; }
++
++    echo "[1/5] role '$seat' -> NOLOGIN (no new database sessions, peer auth included)"
++    psql_su -v seat="$seat" -f "$HERE/revoke-seat.sql"
++
++    echo "[2/5] empty the caged key (no new ssh sessions)"
++    [[ -f "/home/$seat/.ssh/authorized_keys" ]] && sudo truncate -s 0 "/home/$seat/.ssh/authorized_keys"
++
++    echo "[3/5] kill the seat's running processes (live ssh session, MCP server)"
++    sudo pkill -KILL -u "$seat" 2>/dev/null || true
++
++    echo "[4/5] terminate any database backend still open as '$seat'"
++    psql_su -v seat="$seat" -f "$HERE/revoke-seat.sql" >/dev/null   # idempotent; catches a late reconnect
++
++    echo "[5/5] verify"
++    left_procs="$( (pgrep -u "$seat" || true) | wc -l | tr -d " ")"   # pgrep exits 1 on none; keep pipefail quiet
++    left_db="$(psql_su -tAc "SELECT count(*) FROM pg_stat_activity WHERE usename = '$seat'" | tr -d '[:space:]')"
++    can_login="$(psql_su -tAc "SELECT rolcanlogin FROM pg_roles WHERE rolname = '$seat'" | tr -d '[:space:]')"
++    echo "  processes: $left_procs  db sessions: $left_db  can login: $can_login"
++    [[ "$left_procs" == 0 && "$left_db" == 0 && "$can_login" == f ]]       || { echo "ERROR: revocation incomplete" >&2; exit 6; }
++
++    if [[ "$purge" == "--purge" ]]; then
++      psql_su -c "DELETE FROM holon_roles WHERE rolename = '$seat';"
++      psql_su -c "REASSIGN OWNED BY \"$seat\" TO store_owner; DROP OWNED BY \"$seat\"; DROP ROLE \"$seat\";"
++      sudo userdel -r "$seat" 2>/dev/null || true
++      echo "purged '$seat' (role, holon mapping, OS user)."
++    else
++      echo "valve shut for '$seat'. Role kept (NOLOGIN) so its rows stay attributed; use --purge to remove."
++    fi
+     ;;
+   *)
+     grep -E '^# ' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;

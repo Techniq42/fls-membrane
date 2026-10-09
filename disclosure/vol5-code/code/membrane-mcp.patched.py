@@ -1,0 +1,275 @@
+"""
+membrane-mcp.py - the MCP layer for the membrane kit. Apache-2.0 (see LICENSE+NOTICE).
+Volume 5 patched copy. Pairs with 01-schema.sql + 03-hardening.patched.sql.
+
+Exposes the kit's lanes (coordination, registry, escalations, tickets, handoffs)
+as MCP TOOLS, never as database access. Clients get capabilities, not credentials.
+
+What changed from the published file, and why:
+  * The published server connected "by peer auth as the box's OS user". On a
+    single box that user usually owns the tables, and a table owner (or a
+    superuser) bypasses row-level security, so every caged seat would have seen
+    every row. This server now REFUSES to start when its connection is a
+    superuser, has BYPASSRLS, owns a membrane table, or maps to no holon.
+    (MEMBRANE_ALLOW_UNSCOPED=1 overrides, for a single-person demo box only.)
+  * Identity is bound from the connection, never from tool arguments. The
+    agent / from_agent / added_by / opened_by / claimed_by / answered_by /
+    from_seat / seat arguments are gone. The store stamps those columns from
+    the login role (03-hardening.patched.sql), and the server reports who it
+    is through whoami().
+  * Critique writes go to the append-only ticket_critiques table.
+  * New moves: escalation claim / decline, ticket release / close.
+
+Requires:  pip install fastmcp "psycopg[binary]"
+Run (stdio), as a caged seat's own OS user so peer auth maps to the seat role:
+    MEMBRANE_DSN="dbname=membrane" python membrane-mcp.py
+"""
+from __future__ import annotations
+
+import os
+
+import psycopg
+from fastmcp import FastMCP
+from psycopg.rows import dict_row
+
+DSN = os.environ.get("MEMBRANE_DSN", "dbname=membrane")
+ALLOWED_STATUS = {"active", "blocked", "done", "fyi"}
+MEMBRANE_TABLES = ("coordination", "registry", "escalations", "tickets", "handoffs", "tags",
+                   "ticket_critiques", "holon_roles")
+mcp = FastMCP("membrane")
+
+
+class UnscopedConnection(RuntimeError):
+    pass
+
+
+def _q(sql: str, args: tuple = ()) -> list[dict]:
+    with psycopg.connect(DSN, row_factory=dict_row) as c, c.cursor() as cur:
+        cur.execute(sql, args)
+        out = cur.fetchall() if cur.description else []
+        c.commit()
+    for r in out:
+        for k, v in list(r.items()):
+            if hasattr(v, "isoformat"):
+                r[k] = str(v)
+    return out
+
+
+def assert_scoped() -> dict:
+    """Refuse to serve tools over a connection that RLS would not bind."""
+    me = _q("SELECT current_user AS role, r.rolsuper AS super, r.rolbypassrls AS bypass,"
+            " current_holon() AS holon, current_seat() AS seat"
+            " FROM pg_roles r WHERE r.rolname = current_user")[0]
+    owned = _q("SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+               " AND tableowner = current_user AND tablename = ANY(%s)", (list(MEMBRANE_TABLES),))
+    problems = []
+    if me["super"]:
+        problems.append("connection is a SUPERUSER (bypasses row-level security)")
+    if me["bypass"]:
+        problems.append("connection has BYPASSRLS")
+    if owned:
+        problems.append("connection OWNS " + ", ".join(r["tablename"] for r in owned))
+    if not me["holon"]:
+        problems.append("connection role maps to no holon (add it with add-caged-seat.sh)")
+    if problems and os.environ.get("MEMBRANE_ALLOW_UNSCOPED") != "1":
+        raise UnscopedConnection("refusing to serve: " + "; ".join(problems))
+    return me
+
+
+@mcp.tool
+def whoami() -> dict:
+    """Who this server speaks as: the login role (seat) and its holon, both resolved by the store."""
+    me = assert_scoped()
+    return {"seat": me["seat"], "holon": me["holon"]}
+
+
+# ---- coordination lane ----
+@mcp.tool
+def bus_read(limit: int = 15, since_id: int = 0) -> list[dict]:
+    """Read recent coordination-bus rows visible to this seat, newest first."""
+    limit = max(1, min(int(limit), 100))
+    return _q("SELECT id,agent,focus,status,note,ref,created_at FROM coordination WHERE id > %s"
+              " ORDER BY id DESC LIMIT %s", (int(since_id), limit))
+
+
+@mcp.tool
+def bus_post(focus: str, status: str = "active", note: str = "", ref: str = "") -> list[dict]:
+    """Append one working-state row. The author is this seat (stamped by the store)."""
+    if status not in ALLOWED_STATUS:
+        status = "active"
+    return _q("INSERT INTO coordination (agent,focus,status,note,ref) VALUES ('',%s,%s,%s,%s)"
+              " RETURNING id,agent,created_at", (focus, status, note, ref))
+
+
+# ---- registry lane ----
+@mcp.tool
+def registry_read() -> list[dict]:
+    """Read the shared registry (facts every seat sees)."""
+    return _q("SELECT id,entity,kind,added_by,approved_by,source_url,created_at FROM registry ORDER BY created_at")
+
+
+@mcp.tool
+def register(entity: str, source_url: str, kind: str = "organisation", approved_by: str = "") -> list[dict]:
+    """Add one fact. source_url (provenance) is required. approved_by is recorded as stated."""
+    return _q("INSERT INTO registry (entity,kind,added_by,approved_by,source_url) VALUES (%s,%s,'',%s,%s)"
+              " ON CONFLICT (entity) DO NOTHING RETURNING id,entity,added_by", (entity, kind, approved_by, source_url))
+
+
+# ---- escalations lane ----
+@mcp.tool
+def escalate(topic: str, prompt: str) -> list[dict]:
+    """Post a hard question; a bigger tier or a human answers into the same row."""
+    return _q("INSERT INTO escalations (from_agent,topic,prompt) VALUES ('',%s,%s) RETURNING id,from_agent",
+              (topic, prompt))
+
+
+@mcp.tool
+def pending() -> list[dict]:
+    """Open escalations (needs_help) visible to this seat."""
+    return _q("SELECT id,from_agent,topic,left(prompt,120) AS prompt,passes,declined_by,created_at"
+              " FROM escalations WHERE status='needs_help' ORDER BY id")
+
+
+@mcp.tool
+def claim(id: int) -> list[dict]:
+    """Claim an open escalation (needs_help -> claimed). The claimer is this seat."""
+    return _q("UPDATE escalations SET status='claimed' WHERE id=%s AND status='needs_help' RETURNING id,status,claimed_by",
+              (int(id),))
+
+
+@mcp.tool
+def decline(id: int) -> list[dict]:
+    """Give back an escalation you claimed (claimed -> needs_help). Recorded in declined_by."""
+    return _q("UPDATE escalations SET status='needs_help' WHERE id=%s AND status='claimed' RETURNING id,status,passes",
+              (int(id),))
+
+
+@mcp.tool
+def answer(id: int, text: str) -> list[dict]:
+    """Answer an escalation (needs_help or claimed-by-you -> answered). The answerer is this seat."""
+    return _q("UPDATE escalations SET status='answered', answer=%s WHERE id=%s AND status IN ('needs_help','claimed')"
+              " RETURNING id,status,answered_by", (text, int(id)))
+
+
+@mcp.tool
+def read_escalation(id: int) -> list[dict]:
+    """Read one escalation and its answer."""
+    return _q("SELECT id,from_agent,topic,status,claimed_by,answer,answered_by,passes,declined_by"
+              " FROM escalations WHERE id=%s", (int(id),))
+
+
+# ---- ticket lane ----
+_TCOLS = ("id,title,status,opened_by,claimed_by,left(body,200) AS body,deliverable,visibility,"
+          "created_at,updated_at")
+
+
+@mcp.tool
+def ticket_open(title: str, body: str = "", visibility: str = "commons") -> list[dict]:
+    """Open a ticket. visibility: commons | private (private = this holon only)."""
+    vis = "private" if visibility == "private" else "commons"
+    return _q("INSERT INTO tickets (title,body,opened_by,visibility) VALUES (%s,%s,'',%s)"
+              " RETURNING id,status,opened_by", (title, body, vis))
+
+
+@mcp.tool
+def ticket_list(status: str = "", limit: int = 25) -> list[dict]:
+    """Tickets visible to this seat, newest first."""
+    limit = max(1, min(int(limit), 100))
+    if status:
+        return _q(f"SELECT {_TCOLS} FROM tickets WHERE status=%s ORDER BY id DESC LIMIT %s", (status, limit))
+    return _q(f"SELECT {_TCOLS} FROM tickets ORDER BY id DESC LIMIT %s", (limit,))
+
+
+@mcp.tool
+def ticket_read(id: int) -> list[dict]:
+    """One ticket in full, with its critiques."""
+    t = _q("SELECT id,title,body,status,opened_by,claimed_by,deliverable,created_at,updated_at FROM tickets WHERE id=%s",
+           (int(id),))
+    if t:
+        t[0]["critiques"] = _q("SELECT critic,verdict,body,created_at FROM ticket_critiques WHERE ticket_id=%s ORDER BY id",
+                               (int(id),))
+    return t
+
+
+@mcp.tool
+def ticket_claim(id: int) -> list[dict]:
+    """Claim an open ticket (open -> claimed)."""
+    return _q("UPDATE tickets SET status='claimed' WHERE id=%s AND status='open' RETURNING id,status,claimed_by",
+              (int(id),))
+
+
+@mcp.tool
+def ticket_release(id: int) -> list[dict]:
+    """Give back a ticket you claimed (claimed -> open)."""
+    return _q("UPDATE tickets SET status='open' WHERE id=%s AND status='claimed' RETURNING id,status", (int(id),))
+
+
+@mcp.tool
+def ticket_deliver(id: int, deliverable: str) -> list[dict]:
+    """Deliver on a ticket you claimed (claimed -> delivered). Written once."""
+    return _q("UPDATE tickets SET status='delivered',deliverable=%s WHERE id=%s AND status='claimed' RETURNING id,status",
+              (deliverable, int(id)))
+
+
+@mcp.tool
+def ticket_critique(id: int, critique: str, verdict: str = "question") -> list[dict]:
+    """Append a critique to delivered work (verdict: endorse | question | flag). Cross-holon only;
+    a critique can never change the deliverable."""
+    v = verdict if verdict in ("endorse", "question", "flag") else "question"
+    return _q("INSERT INTO ticket_critiques (ticket_id,holon,critic,verdict,body) VALUES (%s,'','',%s,%s)"
+              " RETURNING id,critic,verdict", (int(id), v, critique))
+
+
+@mcp.tool
+def ticket_close(id: int, accept_only: bool = False) -> list[dict]:
+    """Requester: mark delivered work critiqued (accept_only) or closed."""
+    return _q("UPDATE tickets SET status=%s WHERE id=%s AND status IN ('delivered','critiqued') RETURNING id,status",
+              ("critiqued" if accept_only else "closed", int(id)))
+
+
+# ---- handoff lane ----
+def _handoff_send(task: str, to_seat: str, summary: str, need: str, refs: str) -> list[dict]:
+    return _q("INSERT INTO handoffs (task,from_seat,to_seat,summary,need,refs) VALUES (%s,'',%s,%s,%s,%s)"
+              " RETURNING id,task,from_seat,to_seat,status", (task, to_seat, summary, need, refs))
+
+
+@mcp.tool
+def handoff_send(task: str, to_seat: str, summary: str = "", need: str = "", refs: str = "") -> list[dict]:
+    """Pass the next leg of a task to another seat (by holon name). The sender is this seat."""
+    return _handoff_send(task, to_seat, summary, need, refs)
+
+
+@mcp.tool
+def handoff_inbox() -> list[dict]:
+    """Handoffs addressed to this seat that are still pending or accepted."""
+    return _q("SELECT id,task,from_seat,summary,need,refs,status,created_at FROM handoffs"
+              " WHERE to_seat = current_holon() AND status = ANY(%s) ORDER BY id", (["pending", "accepted"],))
+
+
+@mcp.tool
+def handoff_accept(id: int) -> list[dict]:
+    """Take the baton (pending -> accepted). Only the addressee."""
+    return _q("UPDATE handoffs SET status='accepted' WHERE id=%s AND status='pending' RETURNING id,task,status",
+              (int(id),))
+
+
+@mcp.tool
+def handoff_done(id: int) -> list[dict]:
+    """Finish your leg (-> done). Only the addressee."""
+    return _q("UPDATE handoffs SET status='done' WHERE id=%s AND status IN ('pending','accepted') RETURNING id,task,status",
+              (int(id),))
+
+
+@mcp.tool
+def handoff_pass(id: int, to_seat: str, summary: str = "", need: str = "", refs: str = "") -> list[dict]:
+    """Close your leg (-> passed) and open a new handoff to the next seat, carrying the task label."""
+    orig = _q("SELECT task FROM handoffs WHERE id=%s", (int(id),))
+    if not orig:
+        return []
+    _q("UPDATE handoffs SET status='passed' WHERE id=%s AND status IN ('pending','accepted')", (int(id),))
+    return _handoff_send(orig[0]["task"], to_seat, summary, need, refs)
+
+
+if __name__ == "__main__":
+    assert_scoped()
+    mcp.run()

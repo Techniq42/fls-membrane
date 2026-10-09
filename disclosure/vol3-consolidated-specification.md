@@ -1,6 +1,6 @@
-# Coordination Integration Architecture — Consolidated Specification v8
+# Coordination Integration Architecture: Consolidated Specification v8
 
-> Specification as prepared in 2026, in the inventor's voice, published as a defensive publication under CC BY 4.0 instead of being filed. Where it says "this application," read "this specification." Not legal advice.
+> Specification as prepared in 2026, in the inventor's voice, published as a defensive publication under CC BY 4.0 instead of being filed. Where it says "this application," read "this specification." The applications it lists were not carried forward as a consolidated filing; their status is set out in the errata (Volume 5 and ERRATA.md). Not legal advice.
 
 ---
 
@@ -12,7 +12,7 @@
 
 This application claims the benefit of the following United States applications, each incorporated by reference in its entirety: Application 19/409,604, filed December 4, 2025 ("Fractal Coordination Architecture"); Application 19/411,766, filed December 8, 2025 ("Recursive Adaptive Learning Protocol"); Provisional Application 63/935,543, filed December 10, 2025 ("Autonomous Coordination Node"); Provisional Application 63/935,743, filed December 10, 2025 ("Adaptive Bioregional Food Infrastructure"); and Provisional Application 63/940,998, filed December 15, 2025 ("Bioregional Nexus Systems").
 
-Each claim element takes the earliest of these dates at which that element was both disclosed and enabled. The interlock of claim 1, and the per-record governance mechanism, are matter first reduced to practice in 2026 and take this application's filing date; the individual legs have earlier support in the applications listed above.
+Each claim element takes the earliest of these dates at which that element was both disclosed and enabled. The interlock of claim 1, and the per-record governance mechanism, are matter first described in 2026 (the governance mechanism reduced to practice, the interlock set out in constructive form, with a tested worked example in Volume 5); the individual legs have earlier support in the applications listed above.
 
 
 ## FIELD OF THE INVENTION

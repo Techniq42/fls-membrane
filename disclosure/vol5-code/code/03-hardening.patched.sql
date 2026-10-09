@@ -1,0 +1,364 @@
+-- ============================================================================
+-- MEMBRANE KIT - 03-hardening.sql, Volume 5 patched copy   (Apache-2.0)
+-- Applied ON TOP of 01-schema.sql, as a superuser:
+--     psql -v ON_ERROR_STOP=1 -d yourdb -f 01-schema.sql -f 03-hardening.patched.sql
+--
+-- What changed from the published 03-hardening.sql, and why:
+--  1. READ policies are now FOR SELECT. The published commons_or_mine policies had
+--     no FOR clause, so they applied to ALL commands. Permissive policies OR
+--     together, so on UPDATE "commons or mine" was OR-ed with claim_or_answer,
+--     legal_moves and own_rows_only, and any seat could rewrite any commons row,
+--     including moving an answered escalation back to needs_help.
+--  2. WRITE rules are split: one permissive scope policy per command, plus
+--     AS RESTRICTIVE legal-move policies that must ALSO pass, plus BEFORE UPDATE
+--     triggers for what a policy cannot see (the OLD -> NEW transition).
+--  3. Identity columns (agent, from_agent, added_by, opened_by, claimed_by,
+--     answered_by, from_seat) are stamped by the store from the connection's
+--     role. A seat can no longer type someone else's name into them.
+--  4. current_holon() resolves current_user through a sealed view, so it also
+--     works behind an edge that logs in once and SET ROLEs per request.
+--  5. Tables are owned by a NOLOGIN store_owner with FORCE ROW LEVEL SECURITY.
+--  6. Critique is a separate append-only table, cross-holon only. Credit tags
+--     are applied by the store on completed cross-holon events; seats cannot
+--     insert tags.
+--  7. Help-record columns (attempted, passes, declined_by) and a decline move
+--     that re-opens a claimed escalation; provenance (source_url) is required on
+--     new registry rows.
+--  8. The "server-side holon setter" alternative described at the end of the
+--     published file is REMOVED (see the note at the bottom).
+-- ============================================================================
+
+-- 0) IDENTITY ----------------------------------------------------------------
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'store_owner') THEN
+    CREATE ROLE store_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'membrane_app') THEN
+    CREATE ROLE membrane_app NOLOGIN;
+  END IF;
+END $$;
+GRANT USAGE, CREATE ON SCHEMA public TO store_owner;
+
+CREATE TABLE IF NOT EXISTS holon_roles (
+  rolename text PRIMARY KEY,
+  holon    text NOT NULL
+);
+ALTER TABLE holon_roles OWNER TO store_owner;
+REVOKE ALL ON holon_roles FROM PUBLIC, membrane_app;
+
+SET ROLE store_owner;
+-- revoked seats: a role listed here resolves to no holon at once, on every path
+-- (direct login, or an edge session that already switched to the role)
+CREATE TABLE IF NOT EXISTS revoked_seats (
+  rolename   text PRIMARY KEY,
+  revoked_at timestamptz NOT NULL DEFAULT now()
+);
+REVOKE ALL ON revoked_seats FROM PUBLIC;
+
+CREATE OR REPLACE VIEW holon_self WITH (security_barrier = true) AS
+  -- the role this request runs as, if the session that switched to it is STILL a
+  -- member (a revoked edge membership stops resolving at once) and it is not revoked
+  SELECT holon, 1 AS pref FROM holon_roles
+   WHERE rolename = current_user::text
+     AND (current_user = session_user OR pg_has_role(session_user, current_user, 'MEMBER'))
+     AND rolename NOT IN (SELECT rolename FROM revoked_seats)
+  UNION ALL
+  SELECT holon, 2 AS pref FROM holon_roles
+   WHERE rolename = session_user::text
+     AND rolename NOT IN (SELECT rolename FROM revoked_seats);
+RESET ROLE;
+REVOKE ALL ON holon_self FROM PUBLIC;
+GRANT SELECT ON holon_self TO membrane_app;
+
+-- replaces the published SECURITY DEFINER version (drop first: a definer
+-- function cannot be turned into an invoker one by CREATE OR REPLACE alone)
+DROP FUNCTION IF EXISTS current_holon() CASCADE;
+CREATE FUNCTION current_holon() RETURNS text
+  LANGUAGE sql STABLE SET search_path = public, pg_temp AS
+$fn$ SELECT holon FROM holon_self ORDER BY pref LIMIT 1 $fn$;
+CREATE OR REPLACE FUNCTION current_seat() RETURNS text
+  LANGUAGE sql STABLE AS
+$fn$ SELECT CASE WHEN current_holon() IS NULL THEN NULL ELSE current_user::text END $fn$;
+
+-- 1) COLUMNS -------------------------------------------------------------------
+ALTER TABLE coordination ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'commons';
+ALTER TABLE coordination ADD COLUMN IF NOT EXISTS holon      text NOT NULL DEFAULT 'public';
+ALTER TABLE registry     ADD COLUMN IF NOT EXISTS holon      text NOT NULL DEFAULT 'public';
+-- help-record columns on the escalation lane
+ALTER TABLE escalations  ADD COLUMN IF NOT EXISTS attempted   int    NOT NULL DEFAULT 0;
+ALTER TABLE escalations  ADD COLUMN IF NOT EXISTS passes      int    NOT NULL DEFAULT 0;
+ALTER TABLE escalations  ADD COLUMN IF NOT EXISTS declined_by text[] NOT NULL DEFAULT '{}';
+-- who holds a ticket, as a holon (for the cross-holon check)
+ALTER TABLE tickets      ADD COLUMN IF NOT EXISTS claimed_holon text;
+
+-- append-only critique (replaces writing tickets.critique in place)
+CREATE TABLE IF NOT EXISTS ticket_critiques (
+  id         bigserial PRIMARY KEY,
+  ticket_id  bigint NOT NULL REFERENCES tickets(id),
+  holon      text   NOT NULL,
+  critic     text   NOT NULL,
+  verdict    text   NOT NULL CHECK (verdict IN ('endorse','question','flag')),
+  body       text   NOT NULL,
+  visibility text   NOT NULL DEFAULT 'commons',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- 2) OWNERSHIP + FORCE ---------------------------------------------------------
+DO $$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['coordination','registry','escalations','tickets','handoffs','tags','ticket_critiques'] LOOP
+    EXECUTE format('ALTER TABLE %I OWNER TO store_owner', t);
+    EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
+    EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY', t);
+  END LOOP;
+END $$;
+
+-- 3) READ: FOR SELECT only -----------------------------------------------------
+DO $$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['coordination','registry','escalations','tickets','tags','ticket_critiques'] LOOP
+    EXECUTE format('DROP POLICY IF EXISTS commons_or_mine ON %I', t);
+    EXECUTE format($p$CREATE POLICY commons_or_mine ON %I FOR SELECT
+                      USING (visibility = 'commons' OR holon = current_holon())$p$, t);
+    EXECUTE format('DROP POLICY IF EXISTS insert_own_or_commons ON %I', t);
+    EXECUTE format('DROP POLICY IF EXISTS insert_own ON %I', t);
+  END LOOP;
+END $$;
+
+-- 4) INSERT: own holon only (the stamp trigger fills holon for you) ---------------
+DO $$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['coordination','registry','escalations','tickets'] LOOP
+    EXECUTE format('CREATE POLICY insert_own ON %I FOR INSERT WITH CHECK (holon = current_holon())', t);
+  END LOOP;
+END $$;
+
+-- 5) STAMP identity columns from the connection (INVOKER triggers) ---------------
+CREATE OR REPLACE FUNCTION stamp_identity() RETURNS trigger LANGUAGE plpgsql AS $f$
+DECLARE seat text := current_seat(); h text := current_holon();
+BEGIN
+  IF h IS NULL THEN
+    -- only a superuser doing maintenance may write unstamped rows; any other
+    -- unmapped role (an anonymous edge role, a ghost seat, a revoked seat) is refused
+    IF (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) THEN RETURN NEW; END IF;
+    RAISE EXCEPTION 'no seat: this connection maps to no holon';
+  END IF;
+  NEW.holon := h;
+  CASE TG_TABLE_NAME
+    WHEN 'coordination'     THEN NEW.agent      := seat;
+    WHEN 'registry'         THEN NEW.added_by   := seat;
+    WHEN 'escalations'      THEN NEW.from_agent := seat; NEW.status := 'needs_help';
+                                 NEW.claimed_by := NULL; NEW.answer := NULL; NEW.answered_by := NULL;
+    WHEN 'tickets'          THEN NEW.opened_by  := seat; NEW.status := 'open';
+                                 NEW.claimed_by := NULL; NEW.claimed_holon := NULL;
+                                 NEW.deliverable := NULL; NEW.critique := NULL;
+    WHEN 'ticket_critiques' THEN NEW.critic     := seat;
+  END CASE;
+  RETURN NEW;
+END $f$;
+DROP TRIGGER IF EXISTS stamp_identity ON coordination;
+DROP TRIGGER IF EXISTS stamp_identity ON registry;
+DROP TRIGGER IF EXISTS stamp_identity ON escalations;
+DROP TRIGGER IF EXISTS stamp_identity ON tickets;
+DROP TRIGGER IF EXISTS stamp_identity ON ticket_critiques;
+CREATE TRIGGER stamp_identity BEFORE INSERT ON coordination     FOR EACH ROW EXECUTE FUNCTION stamp_identity();
+CREATE TRIGGER stamp_identity BEFORE INSERT ON registry         FOR EACH ROW EXECUTE FUNCTION stamp_identity();
+CREATE TRIGGER stamp_identity BEFORE INSERT ON escalations      FOR EACH ROW EXECUTE FUNCTION stamp_identity();
+CREATE TRIGGER stamp_identity BEFORE INSERT ON tickets          FOR EACH ROW EXECUTE FUNCTION stamp_identity();
+CREATE TRIGGER stamp_identity BEFORE INSERT ON ticket_critiques FOR EACH ROW EXECUTE FUNCTION stamp_identity();
+
+-- 6) UPDATE: grants narrowed to the move columns ----------------------------------
+REVOKE UPDATE ON ALL TABLES IN SCHEMA public FROM membrane_app;
+REVOKE INSERT ON tags FROM membrane_app;                    -- credit is system-applied only
+GRANT UPDATE (focus, status, note, ref) ON coordination TO membrane_app;
+GRANT UPDATE (status, answer)           ON escalations  TO membrane_app;
+GRANT UPDATE (status, deliverable)      ON tickets      TO membrane_app;
+GRANT UPDATE (status, updated_at)       ON handoffs     TO membrane_app;
+GRANT SELECT, INSERT ON ticket_critiques TO membrane_app;  -- no UPDATE, no DELETE: append-only
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO membrane_app;
+
+-- coordination: own rows only
+DROP POLICY IF EXISTS own_rows_only ON coordination;
+CREATE POLICY own_rows_only ON coordination FOR UPDATE
+  USING (holon = current_holon()) WITH CHECK (holon = current_holon());
+
+-- escalations: permissive scope + restrictive legal moves + transition trigger
+DROP POLICY IF EXISTS claim_or_answer ON escalations;
+DROP POLICY IF EXISTS update_scope    ON escalations;
+CREATE POLICY update_scope ON escalations FOR UPDATE
+  USING      (visibility = 'commons' OR holon = current_holon())
+  WITH CHECK (visibility = 'commons' OR holon = current_holon());
+CREATE POLICY claim_or_answer ON escalations AS RESTRICTIVE FOR UPDATE
+  USING      (status IN ('needs_help','claimed'))
+  WITH CHECK (status IN ('needs_help','claimed','answered'));
+
+CREATE OR REPLACE FUNCTION escalation_moves() RETURNS trigger LANGUAGE plpgsql AS $f$
+DECLARE seat text := current_seat();
+BEGIN
+  IF seat IS NULL THEN RAISE EXCEPTION 'escalations: no seat (anonymous or revoked); refused'; END IF;
+  IF OLD.status = 'needs_help' AND NEW.status = 'claimed' THEN
+    NEW.claimed_by := seat;
+  ELSIF OLD.status = 'needs_help' AND NEW.status = 'answered' THEN
+    NEW.claimed_by := seat; NEW.answered_by := seat; NEW.answered_at := now();
+  ELSIF OLD.status = 'claimed' AND NEW.status = 'answered' THEN
+    IF OLD.claimed_by IS DISTINCT FROM seat THEN
+      RAISE EXCEPTION 'escalations: only the claimer (%) may answer', OLD.claimed_by;
+    END IF;
+    NEW.answered_by := seat; NEW.answered_at := now();
+  ELSIF OLD.status = 'claimed' AND NEW.status = 'needs_help' THEN  -- decline: re-open
+    IF OLD.claimed_by IS DISTINCT FROM seat THEN
+      RAISE EXCEPTION 'escalations: only the claimer may decline';
+    END IF;
+    NEW.claimed_by := NULL; NEW.passes := OLD.passes + 1;
+    NEW.declined_by := OLD.declined_by || seat;
+  ELSE
+    RAISE EXCEPTION 'escalations: illegal move % -> %', OLD.status, NEW.status;
+  END IF;
+  IF NEW.status <> 'answered' AND NEW.answer IS DISTINCT FROM OLD.answer THEN
+    RAISE EXCEPTION 'escalations: an answer is written only with status answered';
+  END IF;
+  RETURN NEW;
+END $f$;
+DROP TRIGGER IF EXISTS escalation_moves ON escalations;
+CREATE TRIGGER escalation_moves BEFORE UPDATE ON escalations
+  FOR EACH ROW EXECUTE FUNCTION escalation_moves();
+
+-- tickets: permissive scope + restrictive legal moves + transition trigger
+DROP POLICY IF EXISTS legal_moves  ON tickets;
+DROP POLICY IF EXISTS update_scope ON tickets;
+CREATE POLICY update_scope ON tickets FOR UPDATE
+  USING      (visibility = 'commons' OR holon = current_holon())
+  WITH CHECK (visibility = 'commons' OR holon = current_holon());
+CREATE POLICY legal_moves ON tickets AS RESTRICTIVE FOR UPDATE
+  USING      (status IN ('open','claimed','delivered','critiqued'))      -- closed rows are frozen
+  WITH CHECK (status IN ('open','claimed','delivered','critiqued','closed'));
+
+CREATE OR REPLACE FUNCTION ticket_moves() RETURNS trigger LANGUAGE plpgsql AS $f$
+DECLARE seat text := current_seat(); h text := current_holon();
+BEGIN
+  IF seat IS NULL THEN RAISE EXCEPTION 'tickets: no seat (anonymous or revoked); refused'; END IF;
+  IF NEW.deliverable IS DISTINCT FROM OLD.deliverable
+     AND NOT (OLD.status = 'claimed' AND NEW.status = 'delivered') THEN
+    RAISE EXCEPTION 'tickets: the deliverable is written once, on delivery';
+  END IF;
+  IF OLD.status = 'open' AND NEW.status = 'claimed' THEN
+    NEW.claimed_by := seat; NEW.claimed_holon := h;
+  ELSIF OLD.status = 'claimed' AND NEW.status = 'open' THEN          -- release / decline
+    IF OLD.claimed_holon IS DISTINCT FROM h THEN RAISE EXCEPTION 'tickets: only the claimer may release'; END IF;
+    NEW.claimed_by := NULL; NEW.claimed_holon := NULL;
+  ELSIF OLD.status = 'claimed' AND NEW.status = 'delivered' THEN
+    IF OLD.claimed_holon IS DISTINCT FROM h THEN RAISE EXCEPTION 'tickets: only the claimer may deliver'; END IF;
+    IF NEW.deliverable IS NULL THEN RAISE EXCEPTION 'tickets: delivery needs a deliverable'; END IF;
+  ELSIF OLD.status IN ('delivered','critiqued') AND NEW.status IN ('critiqued','closed') THEN
+    IF OLD.holon IS DISTINCT FROM h THEN RAISE EXCEPTION 'tickets: only the requester may accept or close'; END IF;
+  ELSE
+    RAISE EXCEPTION 'tickets: illegal move % -> %', OLD.status, NEW.status;
+  END IF;
+  NEW.updated_at := now();
+  RETURN NEW;
+END $f$;
+DROP TRIGGER IF EXISTS ticket_moves ON tickets;
+CREATE TRIGGER ticket_moves BEFORE UPDATE ON tickets FOR EACH ROW EXECUTE FUNCTION ticket_moves();
+
+-- critique: append-only, cross-holon only, only on delivered work
+DROP POLICY IF EXISTS critique_cross_holon ON ticket_critiques;
+CREATE POLICY critique_cross_holon ON ticket_critiques FOR INSERT
+  WITH CHECK (holon = current_holon()
+              AND EXISTS (SELECT 1 FROM tickets t
+                           WHERE t.id = ticket_id
+                             AND t.status IN ('delivered','critiqued')
+                             AND t.claimed_holon IS DISTINCT FROM current_holon()));
+
+-- credit: applied by the store (SECURITY DEFINER, owned by store_owner) on a
+-- completed cross-holon event. Holon values come from rows already stamped.
+DROP POLICY IF EXISTS tags_system_insert ON tags;
+CREATE POLICY tags_system_insert ON tags FOR INSERT TO store_owner WITH CHECK (true);
+GRANT INSERT ON tags TO store_owner;
+
+CREATE OR REPLACE FUNCTION award_tag() RETURNS trigger
+  LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $f$
+BEGIN
+  IF TG_TABLE_NAME = 'tickets' THEN
+    IF NEW.status = 'delivered' AND OLD.status = 'claimed' AND NEW.claimed_holon IS NOT NULL
+       AND NEW.claimed_holon IS DISTINCT FROM NEW.holon THEN
+      INSERT INTO tags (holon, tag, ref) VALUES (NEW.claimed_holon, 'delivered', 'ticket:' || NEW.id);
+    END IF;
+  ELSIF TG_TABLE_NAME = 'ticket_critiques' AND NEW.holon IS NOT NULL THEN
+    INSERT INTO tags (holon, tag, ref) VALUES (NEW.holon, 'checked', 'ticket:' || NEW.ticket_id);
+  END IF;
+  RETURN NULL;
+END $f$;
+ALTER FUNCTION award_tag() OWNER TO store_owner;
+REVOKE ALL ON FUNCTION award_tag() FROM PUBLIC;
+DROP TRIGGER IF EXISTS award_tag ON tickets;
+DROP TRIGGER IF EXISTS award_tag ON ticket_critiques;
+CREATE TRIGGER award_tag AFTER UPDATE ON tickets          FOR EACH ROW EXECUTE FUNCTION award_tag();
+CREATE TRIGGER award_tag AFTER INSERT ON ticket_critiques FOR EACH ROW EXECUTE FUNCTION award_tag();
+
+-- handoffs: unchanged scope policies (already split per command), now with a
+-- forward-only transition trigger and a stamped sender
+ALTER TABLE handoffs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_seat        ON handoffs;
+DROP POLICY IF EXISTS handoffs_select ON handoffs;
+DROP POLICY IF EXISTS handoffs_insert ON handoffs;
+DROP POLICY IF EXISTS handoffs_update ON handoffs;
+CREATE POLICY handoffs_select ON handoffs FOR SELECT
+  USING (to_seat = current_holon() OR from_seat = current_holon());
+CREATE POLICY handoffs_insert ON handoffs FOR INSERT
+  WITH CHECK (from_seat = current_holon());
+CREATE POLICY handoffs_update ON handoffs FOR UPDATE
+  USING      (to_seat = current_holon() OR from_seat = current_holon())
+  WITH CHECK (to_seat = current_holon() OR from_seat = current_holon());
+
+CREATE OR REPLACE FUNCTION handoff_moves() RETURNS trigger LANGUAGE plpgsql AS $f$
+DECLARE h text := current_holon();
+BEGIN
+  IF h IS NULL THEN RAISE EXCEPTION 'handoffs: no seat (anonymous or revoked); refused'; END IF;
+  IF TG_OP = 'INSERT' THEN NEW.from_seat := h; NEW.status := 'pending'; RETURN NEW; END IF;
+  IF (OLD.status, NEW.status) IN (('pending','accepted'), ('pending','done'), ('accepted','done')) THEN
+    IF OLD.to_seat IS DISTINCT FROM h THEN RAISE EXCEPTION 'handoffs: only the addressee may accept or finish'; END IF;
+  ELSIF NEW.status = 'passed' AND OLD.status IN ('pending','accepted') THEN
+    NULL;                                                   -- either party may re-route
+  ELSE
+    RAISE EXCEPTION 'handoffs: illegal move % -> %', OLD.status, NEW.status;
+  END IF;
+  NEW.updated_at := now();
+  RETURN NEW;
+END $f$;
+DROP TRIGGER IF EXISTS handoff_moves ON handoffs;
+CREATE TRIGGER handoff_moves BEFORE INSERT OR UPDATE ON handoffs FOR EACH ROW EXECUTE FUNCTION handoff_moves();
+
+-- registry: append-only (no UPDATE grant) and provenance required on new rows
+ALTER TABLE registry DROP CONSTRAINT IF EXISTS registry_provenance;
+ALTER TABLE registry ADD CONSTRAINT registry_provenance
+  CHECK (source_url IS NOT NULL AND length(trim(source_url)) > 0) NOT VALID;
+
+-- 7) INTEGRITY ------------------------------------------------------------------
+ALTER TABLE escalations DROP CONSTRAINT IF EXISTS valid_status;
+ALTER TABLE escalations ADD CONSTRAINT valid_status
+  CHECK (status IN ('needs_help','claimed','answered')) NOT VALID;
+ALTER TABLE tickets DROP CONSTRAINT IF EXISTS valid_status;
+ALTER TABLE tickets ADD CONSTRAINT valid_status
+  CHECK (status IN ('open','claimed','delivered','critiqued','closed')) NOT VALID;
+ALTER TABLE handoffs DROP CONSTRAINT IF EXISTS valid_status;
+ALTER TABLE handoffs ADD CONSTRAINT valid_status
+  CHECK (status IN ('pending','accepted','done','passed')) NOT VALID;
+CREATE INDEX IF NOT EXISTS escalations_poll ON escalations (status, created_at);
+
+-- Maintenance note: the move triggers refuse any connection that maps to no seat.
+-- An administrator doing repairs runs as a superuser, or disables the triggers
+-- explicitly for that session:  SET session_replication_role = replica;
+
+-- ============================================================================
+-- REMOVED: "set the holon SERVER-SIDE inside a trusted capability layer".
+-- A setter that writes a session variable the policies then trust is only as
+-- strong as the promise that no client ever gets raw SQL on that connection,
+-- because any SQL client can SET the same variable. That is policy, and this
+-- kit's claim is that the gate is not policy. The supported model is one login
+-- role per seat (provisioned by add-caged-seat.sh), resolved by current_holon().
+-- An edge that logs in once and SET ROLEs per verified request (PostgREST and
+-- similar) is also supported, because current_holon() reads current_user.
+-- ============================================================================

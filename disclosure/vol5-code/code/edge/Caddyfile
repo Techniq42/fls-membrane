@@ -1,0 +1,20 @@
+# Caddyfile - edge in front of PostgREST (Volume 5, Section F). Apache-2.0. UNTESTED.
+# The public site and the private board are two readings of one rule: requests
+# without a token reach PostgREST as web_anon (commons only); requests with a
+# token are admitted only after an identity check.
+#
+# Option 1: PostgREST verifies the JWT itself (simplest). Caddy only terminates TLS.
+board.example.org {
+	reverse_proxy 127.0.0.1:3000
+}
+
+# Option 2: forward_auth to an identity service you run (e.g. an OIDC proxy),
+# which returns 2xx and an Authorization header for admitted seats, 401 otherwise.
+# Requests never reach the host's database port; only Caddy listens publicly.
+private.example.org {
+	forward_auth 127.0.0.1:4180 {
+		uri /verify
+		copy_headers Authorization
+	}
+	reverse_proxy 127.0.0.1:3000
+}
