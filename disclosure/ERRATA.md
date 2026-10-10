@@ -1,8 +1,8 @@
-# Errata and changes in v1.1
+# Errata and changes
 
-*Solid Ground: the complete record* is archived permanently, so every version stays readable at its DOI. This page lists what changed between v1.0 (October 8, 2026) and v1.1, and why. The current version is the one to read and cite.
+*Solid Ground: the complete record* is archived permanently, so every version stays readable at its DOI. This page lists what changed in each version after v1.0 (October 8, 2026), and why. The current version is the one to read and cite.
 
-## Corrections
+## v1.1 corrections
 
 **Status of the five applications.** v1.0 said I chose not to pursue the five applications. That is accurate for four of them. The correct status:
 
@@ -31,3 +31,7 @@ Volumes 1 and 3, the Volume 2 cover and the README now say this.
 
 - **Volume 5: Technical Supplement.** Worked, tested detail for the software method (the interlock, the learning loop, the comprehension gate, the user-held skill file, learner-granted reporting, attribution) and the physical systems (waste to soil, the recipe packet, rescue pre-emption, the fabrication node, the off-grid node, the sensory interface, the property-line arrangement), with sources for every component credited to the people who demonstrated it.
 - **Volume 2 appendices:** the fuller drawing set for application 3 (December 9, 2025) and drawings for application 4, which were never drawn at filing and were drawn in October 2026.
+
+## v1.2
+
+- **Volume 1, Secret three and the glossary entry for reverse navigation.** The text said the loop would run "three passes or five hundred". That undersold the method. Persisting toward the goal never means repeating a lesson: when an approach does not land, the loop returns from a different modality, analogy, cultural reference or level, and learns which approaches reach that person. The narrative, the glossary entry and statement 18 now say so, matching Volume 5.

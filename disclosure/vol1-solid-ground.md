@@ -215,7 +215,7 @@ Let me first give you the third leg properly, because it is the one that makes t
 
 So the third leg is reverse navigation applied to goals. You give the system a goal and it works backward from it. It derives the steps that would get there, rather than executing a sequence someone wrote in advance. It generates output. It evaluates that output against a completion criterion, a real test of whether the goal was met. Then it regenerates, aimed at whatever the evaluation revealed, and it does this again and again until the criterion is actually satisfied.
 
-Applied to teaching, that means the loop reads how a given learner is doing, adjusts its approach to what it sees, and persists until the learner actually demonstrates the thing. Three passes or five hundred, it does not care. It stops when the kid gets it.
+Applied to teaching, that means the loop reads how a given learner is doing and persists until the learner actually demonstrates the thing. Persisting does not mean repeating. When an explanation does not land, the loop does not run the same lesson again. It comes back around from a different angle: another modality, another analogy, a cultural reference that is closer to home, a step further back to something the learner already holds. It keeps track of which angles work for this particular person, so it gets better at reaching them over time. Nobody declares the learner stuck; a human helper is an offer the learner can take up whenever they want. It stops when the kid gets it.
 
 When it is done, it writes what was achieved, what guidance was given, and a score back into both the participant's SOUL and the authority's record, so that everyone's understanding improves from the same result, not only the learner's.
 
@@ -413,7 +413,7 @@ Some of these ideas do not have common names yet, so I am giving them the ones I
 
 **The per-record rule, which is the interlock.** One rule, evaluated by the store, that decides access record by record and in doing so enforces sovereignty, governs the recursion, and resists instruction at once. In the running form: a participant may see a record if it is marked common or if its owner-scope matches the participant's own.
 
-**Reverse navigation.** The way the goal-directed loop works, and the name I learned for it in the Army: start from where you are going, derive backward every step it takes to get there, then walk the steps, checking against the destination and correcting until you arrive. Applied to a machine helping a person, it is the loop that persists until the goal is actually met.
+**Reverse navigation.** The way the goal-directed loop works, and the name I learned for it in the Army: start from where you are going, derive backward every step it takes to get there, then walk the steps, checking against the destination and correcting until you arrive. Applied to a machine helping a person, it is the loop that persists until the goal is actually met, coming back from a different modality, analogy or reference each time an approach does not land, rather than repeating it.
 
 **A capability-scoped connection.** The way a seat joins: a fixed set of permitted operations on assigned records, with no host-level or database-level access to the machine underneath. Capability, not access.
 
@@ -650,7 +650,7 @@ The numbered statements below set out, as exactly as I can manage, what this doc
 
 **17.** The system of statement 1, wherein, upon the completion criterion being met, the system writes achievement information, guidance information, and a score to both the participant-held context and an authority-facing monitoring record, such that both are updated from the same result.
 
-**18.** The system of statement 1, wherein evaluating the response comprises identifying a cause of a comprehension failure and selecting the regenerated output in dependence on the identified cause.
+**18.** The system of statement 1, wherein evaluating the response comprises identifying a cause of a comprehension failure and selecting the regenerated output in dependence on the identified cause, the regenerated output differing from the failed output in at least one of modality, analogy, cultural reference or level, and the cycle recording which approaches succeed for that participant.
 
 **19.** The system of statement 1, wherein the generating of output is grounded, through retrieval-augmented generation, in a documented corpus of a designated expert, such that generated instruction transfers the expert's documented approach.
 
