@@ -22,4 +22,6 @@ In December 2025 I filed five patent applications on a way for people and machin
 
 **Citing.** Dobbs, S. (2026). *Solid Ground: the complete record* (v1.3). Zenodo. [https://doi.org/10.5281/zenodo.23251327](https://doi.org/10.5281/zenodo.23251327) (all versions). The citable version is the Zenodo DOI paired with the matching tagged release of this repository.
 
+**Companion essay.** *Count Past the Fence: An Operational Definition of Regeneration* defines what the coordination layer is built to measure. Read it at [shannondobbs.com/count-past-the-fence](https://www.shannondobbs.com/count-past-the-fence/); cite it as [https://doi.org/10.5281/zenodo.24375230](https://doi.org/10.5281/zenodo.24375230).
+
 **Read it online.** [shannondobbs.com/solid-ground](https://www.shannondobbs.com/solid-ground/)
