@@ -8,7 +8,7 @@
 
 | # | Application | Type | Status |
 |---|---|---|---|
-| 1 | 19/409,604, filed Dec 4, 2025 | Utility | Still technically pending. By December 2026 I will either let it lapse or hand it to a partner who holds it for the commons, and I will say which here. |
+| 1 | 19/409,604, filed Dec 4, 2025 | Utility | Pending at v1.1; let go in v1.3 and covered by the pledge (see v1.3 below). |
 | 2 | 19/411,766, filed Dec 8, 2025 | Utility | Abandoned September 3, 2026. |
 | 3 | 63/935,543, filed Dec 10, 2025 | Provisional | Not carried forward. |
 | 4 | 63/935,743, filed Dec 10, 2025 | Provisional | Not carried forward. |
@@ -35,3 +35,9 @@ Volumes 1 and 3, the Volume 2 cover and the README now say this.
 ## v1.2
 
 - **Volume 1, Secret three and the glossary entry for reverse navigation.** The text said the loop would run "three passes or five hundred". That undersold the method. Persisting toward the goal never means repeating a lesson: when an approach does not land, the loop returns from a different modality, analogy, cultural reference or level, and learns which approaches reach that person. The narrative, the glossary entry and statement 18 now say so, matching Volume 5.
+
+## v1.3
+
+- **The patent non-assertion pledge.** Fellowship of Living Systems and I pledge, irrevocably, never to assert any patent or patent application against anyone for practicing anything in this record. The full text is in [PLEDGE.md](PLEDGE.md). It covers any patent that might ever issue from the five applications, and it travels with any such right if it were ever transferred.
+- **Application 19/409,604**, the last one still pending: I filed an express abandonment with the USPTO on November 19, 2026. All five applications are now let go.
+- **Volume 1 and the README** now say so, replacing the v1.1 wording that left the decision open until December 2026.

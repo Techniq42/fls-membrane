@@ -9,7 +9,7 @@
 >
 > This document gives a methodology to the public. I am publishing it whole, with nothing held back, so that it stands as prior art and stays free for anyone to read, build on, and improve, and so that no one can fence it off.
 >
-> I filed five patent applications on this in December 2025. I let four of them go. The first is still technically pending, and by December 2026 I will either let it lapse or hand it to a partner who holds it for the commons. I am publishing instead, so that nobody can lock it up. Whether I also bind myself with a formal pledge never to assert a patent right in this, or hand a United States patent to a partner who holds it for the commons, I will decide and say here by December 2026. That is the whole idea in one move, and it is how the rest of this document works too. I hand you the method, I tell you exactly how it runs, and you owe me nothing but the attribution the license asks for. If you build something with it, I would like to hear about it. Come find me at the fire.
+> I filed five patent applications on this in December 2025, and I have let all five go. I am publishing instead, so that nobody can lock it up, and I have pledged never to assert a patent right in any of it, against anyone. The pledge is published with this record. That is the whole idea in one move, and it is how the rest of this document works too. I hand you the method, I tell you exactly how it runs, and you owe me nothing but the attribution the license asks for. If you build something with it, I would like to hear about it. Come find me at the fire.
 
 ## TL;DR
 
@@ -21,7 +21,7 @@
 - The machine works backward from the goal and keeps going until the goal is actually met. I call that reverse navigation, after the man who taught it to me.
 - Connect without exposure: a capability instead of a login, scoped to assigned records, revocable in a second.
 - Stand it up yourselves, on ground you hold. Nobody has to say yes.
-- I filed five patent applications in December 2025 and let four of them go; the first is still technically pending until I decide by December 2026. I published this instead, so nobody can lock it up. It is yours.
+- I filed five patent applications in December 2025 and let all five go. I published this instead and pledged never to assert a patent on it, so nobody can lock it up, including me. It is yours.
 
 ---
 
