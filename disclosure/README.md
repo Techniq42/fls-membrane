@@ -20,7 +20,7 @@ In December 2025 I filed five patent applications on a way for people and machin
 
 **Rights.** Every right I hold in this work, and every right held by Fellowship of Living Systems, the company I own that keeps the reference code, is dedicated under these licenses: prose and drawings under Creative Commons Attribution 4.0 International, code under the Apache License 2.0. Carry the attribution with the work. Fellowship of Living Systems and I have also made an irrevocable patent non-assertion pledge covering everything in this record: see [PLEDGE.md](PLEDGE.md).
 
-**Citing.** Dobbs, S. (2026). *Solid Ground: the complete record* (v1.3). Zenodo. [https://doi.org/10.5281/zenodo.23251327](https://doi.org/10.5281/zenodo.23251327) (all versions). The citable version is the Zenodo DOI paired with the matching tagged release of this repository.
+**Citing.** Dobbs, S. (2026). *Solid Ground: the complete record* (v1.3). Zenodo. [https://doi.org/10.5281/zenodo.23251327](https://doi.org/10.5281/zenodo.23251327) (all versions). The citable version is the Zenodo DOI paired with the matching tagged release of this repository. Volumes 1 and 5 (v1.2) are also posted at Technical Disclosure Commons: [tdcommons.org/dpubs_series/12127](https://www.tdcommons.org/dpubs_series/12127/).
 
 **Companion essay.** *Count Past the Fence: An Operational Definition of Regeneration* defines what the coordination layer is built to measure. Read it at [shannondobbs.com/count-past-the-fence](https://www.shannondobbs.com/count-past-the-fence/); cite it as [https://doi.org/10.5281/zenodo.24375230](https://doi.org/10.5281/zenodo.24375230).
 
